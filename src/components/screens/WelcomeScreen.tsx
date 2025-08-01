@@ -14,7 +14,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
         <SimpleMascot state="idle" size="lg" />
         
         <div className="space-y-4">
-          <h1 className="text-xl font-bold text-[hsl(var(--text-primary))]">
+          <h1 className="text-xl font-medium text-[hsl(var(--text-primary))]">
             Welcome to Quiby
           </h1>
           <p className="text-base text-[hsl(var(--text-secondary))] max-w-sm">
@@ -25,7 +25,6 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
         <Button 
           onClick={onStart}
           size="lg"
-          className="bg-gradient-to-r from-[hsl(var(--primary))] to-[hsl(var(--accent))] hover:from-[hsl(var(--accent))] hover:to-[hsl(var(--primary))] text-white px-8"
         >
           Get Started
         </Button>

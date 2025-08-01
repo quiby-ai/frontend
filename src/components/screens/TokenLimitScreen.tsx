@@ -44,7 +44,7 @@ export const TokenLimitScreen: React.FC<TokenLimitScreenProps> = ({
         <Card className="p-6 bg-[hsl(var(--surface))] border-[hsl(var(--surface))]">
           <div className="space-y-6">
             <div className="text-center">
-              <div className="text-2xl font-bold text-[hsl(var(--primary))]">
+              <div className="text-2xl font-medium text-[hsl(var(--primary))]">
                 {currentLimit.toLocaleString()}
               </div>
               <div className="text-sm text-[hsl(var(--text-secondary))]">

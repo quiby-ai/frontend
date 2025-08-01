@@ -2,17 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-smooth: always; /* for Safari */
+  text-rendering: geometricPrecision;
+}
+
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Nunito', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
   /* Primary colors – consistent with ClientPulse.ai */
   --background: 15 20 25;          /* #0F1419 */
   --surface: 26 31 46;             /* #1A1F2E */
-  --primary: 0 174 239;            /* #00AEEF */
-  --secondary: 135 211 248;        /* #87D3F8 */
-  --accent: 88 168 255;            /* #58A8FF */
+  --primary: 6 182 212;            /* #06B6D4 - Better cyan with higher contrast */
+  --secondary: 125 211 252;        /* #7DD3FC - Softer blue */
+  --accent: 34 197 94;             /* #22C55E - Green accent for better contrast */
 
   /* Text */
   --text-primary: 255 255 255;     /* #FFFFFF */
@@ -20,9 +28,9 @@
   --text-muted: 100 116 139;       /* #64748B */
 
   /* Status colors */
-  --success: 16 185 129;           /* #10B981 */
-  --error: 239 68 68;              /* #EF4444 */
-  --warning: 245 158 11;           /* #F59E0B */
+  --success: 34 197 94;            /* #22C55E - Vibrant green */
+  --error: 248 113 113;            /* #F87171 - Softer red, less harsh */
+  --warning: 251 191 36;           /* #FBBF24 - Warm yellow */
 
   /* Mobile spacing units */
   --space-xs: 0.5rem;  /* 8px */
@@ -53,8 +61,11 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background-color: hsl(var(--background));
+  background-color: hsl(var(--surface));
   color: hsl(var(--text-primary));
+  font-family: 'Nunito', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 #root {
@@ -65,27 +76,37 @@ body {
 /* Mobile Typography */
 .text-xl { 
   font-size: 1.25rem; 
-  line-height: 1.4; 
+  line-height: 1.4;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .text-lg { 
   font-size: 1.125rem; 
-  line-height: 1.4; 
+  line-height: 1.4;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .text-base { 
   font-size: 1rem; 
-  line-height: 1.5; 
+  line-height: 1.5;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .text-sm { 
   font-size: 0.875rem; 
-  line-height: 1.5; 
+  line-height: 1.5;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .text-xs { 
   font-size: 0.75rem; 
-  line-height: 1.4; 
+  line-height: 1.4;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 /* Mobile Responsive */
@@ -123,6 +144,124 @@ body {
   animation: pulse-glow 2s infinite;
 }
 
+/* Simple loading animation */
+
+@keyframes simplePulse {
+  0%, 100% {
+    box-shadow: 
+      0 0 0 0 hsl(var(--primary) / 0.4),
+      0 0 20px hsl(var(--accent) / 0.2);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 
+      0 0 0 8px hsl(var(--primary) / 0),
+      0 0 30px hsl(var(--accent) / 0.4);
+    transform: scale(1.02);
+  }
+}
+
+.loading-simple {
+  position: relative;
+  animation: simplePulse 2s ease-in-out infinite;
+  background: linear-gradient(45deg, #00AEEF, #58A8FF);
+}
+
+.loading-simple::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    ellipse at 30% 20%, 
+    rgba(255, 255, 255, 0.3) 0%, 
+    rgba(255, 255, 255, 0.1) 40%, 
+    transparent 70%
+  );
+  border-radius: inherit;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.liquid-wave {
+  position: absolute;
+  bottom: 0;
+  left: -50%;
+  width: 200%;
+  background: linear-gradient(
+    125deg,
+    #00AEEF 0%,
+    #58A8FF 25%,
+    hsl(var(--primary)) 50%,
+    #58A8FF 75%,
+    #00AEEF 100%
+  );
+  border-radius: 50%;
+  animation: fillUp 4s ease-in-out infinite;
+  box-shadow: 
+    inset 0 0 20px rgba(0, 174, 239, 0.3),
+    0 0 10px rgba(88, 168, 255, 0.2);
+}
+
+.liquid-wave::before {
+  content: '';
+  position: absolute;
+  top: -60%;
+  left: -30%;
+  width: 160%;
+  height: 160%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 30%, 
+    rgba(0, 174, 239, 0.4) 40%,
+    rgba(88, 168, 255, 0.3) 50%,
+    transparent 60%,
+    rgba(0, 174, 239, 0.2) 70%,
+    transparent 80%
+  );
+  border-radius: 50%;
+  animation: wave1 5s linear infinite;
+}
+
+.liquid-wave::after {
+  content: '';
+  position: absolute;
+  top: -70%;
+  right: -30%;
+  width: 160%;
+  height: 160%;
+  background: conic-gradient(
+    from 180deg,
+    transparent 25%, 
+    rgba(88, 168, 255, 0.5) 35%,
+    rgba(0, 174, 239, 0.3) 45%,
+    transparent 55%,
+    rgba(88, 168, 255, 0.25) 65%,
+    transparent 75%
+  );
+  border-radius: 50%;
+  animation: wave2 3.5s linear infinite;
+}
+
+/* Additional wave layer for more realism */
+.liquid-wave-extra {
+  position: absolute;
+  bottom: 0;
+  left: -25%;
+  width: 150%;
+  height: 80%;
+  background: radial-gradient(
+    ellipse at bottom,
+    rgba(0, 174, 239, 0.15) 0%,
+    rgba(88, 168, 255, 0.1) 40%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  animation: wave3 6s ease-in-out infinite;
+}
+
 @keyframes bounce-gentle {
   0%, 100% {
     transform: translateY(0);
@@ -134,4 +273,13 @@ body {
 
 .animate-bounce-gentle {
   animation: bounce-gentle 2s infinite;
+}
+
+/* Welcome text optimization */
+.welcome-text {
+  transform: translateZ(0);
+  will-change: transform;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: geometricPrecision;
 }

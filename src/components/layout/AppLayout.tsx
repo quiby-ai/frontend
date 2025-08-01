@@ -10,7 +10,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, className }) => 
   return (
     <div className={cn(
       "min-h-screen w-full flex flex-col",
-      "bg-gradient-to-b from-[hsl(var(--background))] to-[hsl(var(--surface))]",
+      "bg-background",
       className
     )}>
       <div className="flex-1 flex flex-col items-center justify-center p-4 max-w-md mx-auto w-full">

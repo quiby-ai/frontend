@@ -27,7 +27,7 @@ export const SuccessScreen: React.FC<SuccessScreenProps> = ({
           <Card className="p-6 bg-[hsl(var(--surface))] border-[hsl(var(--surface))]">
             <div className="space-y-4">
               <div>
-                <div className="text-2xl font-bold text-[hsl(var(--success))]">
+                <div className="text-2xl font-medium text-[hsl(var(--success))]">
                   {results.reviewCount.toLocaleString()}
                 </div>
                 <div className="text-sm text-[hsl(var(--text-secondary))]">
