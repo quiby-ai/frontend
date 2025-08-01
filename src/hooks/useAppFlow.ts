@@ -1,0 +1,107 @@
+import { useState, useCallback } from 'react';
+import { AppState, AppStep, App, ProcessingResults } from '@/types';
+
+const initialState: AppState = {
+  currentStep: 'loading',
+  isAuthenticated: false,
+};
+
+export const useAppFlow = () => {
+  const [state, setState] = useState<AppState>(initialState);
+
+  const setStep = useCallback((step: AppStep) => {
+    setState(prev => ({ ...prev, currentStep: step }));
+  }, []);
+
+  const setAuthenticated = useCallback((isAuthenticated: boolean) => {
+    setState(prev => ({ ...prev, isAuthenticated }));
+  }, []);
+
+  const selectApp = useCallback((app: App) => {
+    setState(prev => ({ ...prev, selectedApp: app }));
+  }, []);
+
+  const selectCountries = useCallback((countries: string[]) => {
+    setState(prev => ({ ...prev, selectedCountries: countries }));
+  }, []);
+
+  const setTokenLimit = useCallback((limit: number) => {
+    setState(prev => ({ ...prev, tokenLimit: limit }));
+  }, []);
+
+  const setError = useCallback((error: Error) => {
+    setState(prev => ({ ...prev, error, currentStep: 'error' }));
+  }, []);
+
+  const setResults = useCallback((results: ProcessingResults) => {
+    setState(prev => ({ ...prev, results, currentStep: 'success' }));
+  }, []);
+
+  const startProcessing = useCallback(() => {
+    const jobId = `job_${Date.now()}`;
+    setState(prev => ({ ...prev, jobId, currentStep: 'processing' }));
+    
+    // Simulate processing
+    setTimeout(() => {
+      if (state.selectedApp && state.selectedCountries && state.tokenLimit) {
+        const results: ProcessingResults = {
+          reviewCount: Math.floor(Math.random() * 1000) + 100,
+          app: state.selectedApp,
+          countries: state.selectedCountries,
+          tokenLimit: state.tokenLimit,
+          jobId,
+        };
+        setResults(results);
+      }
+    }, 5000);
+  }, [state.selectedApp, state.selectedCountries, state.tokenLimit]);
+
+  const proceedToNextStep = useCallback(() => {
+    const { currentStep } = state;
+    
+    switch (currentStep) {
+      case 'loading':
+        setStep('welcome');
+        break;
+      case 'welcome':
+        setStep('app_selection');
+        break;
+      case 'app_selection':
+        if (state.selectedApp) {
+          setStep('country_selection');
+        }
+        break;
+      case 'country_selection':
+        if (state.selectedCountries?.length) {
+          setStep('token_limit');
+        }
+        break;
+      case 'token_limit':
+        if (state.tokenLimit) {
+          startProcessing();
+        }
+        break;
+      case 'error':
+        setStep('welcome');
+        break;
+    }
+  }, [state, setStep, startProcessing]);
+
+  const reset = useCallback(() => {
+    setState(initialState);
+  }, []);
+
+  return {
+    ...state,
+    setStep,
+    setAuthenticated,
+    selectApp,
+    selectCountries,
+    setTokenLimit,
+    setError,
+    setResults,
+    startProcessing,
+    proceedToNextStep,
+    reset,
+  };
+};

@@ -1,0 +1,137 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  /* Primary colors – consistent with ClientPulse.ai */
+  --background: 15 20 25;          /* #0F1419 */
+  --surface: 26 31 46;             /* #1A1F2E */
+  --primary: 0 174 239;            /* #00AEEF */
+  --secondary: 135 211 248;        /* #87D3F8 */
+  --accent: 88 168 255;            /* #58A8FF */
+
+  /* Text */
+  --text-primary: 255 255 255;     /* #FFFFFF */
+  --text-secondary: 148 163 184;   /* #94A3B8 */
+  --text-muted: 100 116 139;       /* #64748B */
+
+  /* Status colors */
+  --success: 16 185 129;           /* #10B981 */
+  --error: 239 68 68;              /* #EF4444 */
+  --warning: 245 158 11;           /* #F59E0B */
+
+  /* Mobile spacing units */
+  --space-xs: 0.5rem;  /* 8px */
+  --space-sm: 0.75rem; /* 12px */
+  --space-md: 1rem;    /* 16px */
+  --space-lg: 1.5rem;  /* 24px */
+  --space-xl: 2rem;    /* 32px */
+
+  /* Override shadcn variables */
+  --foreground: var(--text-primary);
+  --card: var(--surface);
+  --card-foreground: var(--text-primary);
+  --popover: var(--surface);
+  --popover-foreground: var(--text-primary);
+  --primary-foreground: var(--background);
+  --secondary-foreground: var(--background);
+  --muted: var(--surface);
+  --muted-foreground: var(--text-muted);
+  --accent-foreground: var(--background);
+  --destructive: var(--error);
+  --destructive-foreground: var(--text-primary);
+  --border: var(--surface);
+  --input: var(--surface);
+  --ring: var(--primary);
+  --radius: 0.5rem;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: hsl(var(--background));
+  color: hsl(var(--text-primary));
+}
+
+#root {
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Mobile Typography */
+.text-xl { 
+  font-size: 1.25rem; 
+  line-height: 1.4; 
+}
+
+.text-lg { 
+  font-size: 1.125rem; 
+  line-height: 1.4; 
+}
+
+.text-base { 
+  font-size: 1rem; 
+  line-height: 1.5; 
+}
+
+.text-sm { 
+  font-size: 0.875rem; 
+  line-height: 1.5; 
+}
+
+.text-xs { 
+  font-size: 0.75rem; 
+  line-height: 1.4; 
+}
+
+/* Mobile Responsive */
+@media (max-width: 480px) {
+  .text-xl { font-size: 1.125rem; }
+  .text-lg { font-size: 1rem; }
+}
+
+@media (max-width: 320px) {
+  .space-y-6 > * + * {
+    margin-top: 1rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom animations */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px hsl(var(--primary) / 0);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite;
+}
+
+@keyframes bounce-gentle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.animate-bounce-gentle {
+  animation: bounce-gentle 2s infinite;
+}
