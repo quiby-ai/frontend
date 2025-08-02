@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useAppFlow } from '@/hooks/useAppFlow';
+import { useAuth } from '@/hooks/useAuth';
 
 // Screen imports
 import { LoadingScreen } from '@/components/screens/LoadingScreen';
@@ -19,7 +20,6 @@ function App() {
     tokenLimit,
     results,
     error,
-    isAuthenticated,
     setStep,
     setAuthenticated,
     selectApp,
@@ -29,23 +29,28 @@ function App() {
     reset
   } = useAppFlow();
 
-  // Handle authentication completion
+  const { isAuthenticated: userIsAuthenticated } = useAuth();
+
   const handleAuthenticated = () => {
     setAuthenticated(true);
     setStep('welcome');
   };
 
-  // Handle viewing results (could navigate to external link or new screen)
+  useEffect(() => {
+    if (userIsAuthenticated) {
+      setAuthenticated(true);
+      if (currentStep === 'loading') {
+        setStep('welcome');
+      }
+    }
+  }, [userIsAuthenticated, currentStep, setAuthenticated, setStep]);
+
   const handleViewResults = () => {
-    // In a real app, this would navigate to a detailed results page
-    // For demo purposes, we'll just reset the flow
     console.log('Viewing results:', results);
     alert(`Analysis complete!\n\nApp: ${results?.app.name}\nReviews: ${results?.reviewCount}\nCountries: ${results?.countries.join(', ')}`);
     reset();
     setStep('welcome');
   };
-
-  // Render the appropriate screen based on current step
   const renderCurrentScreen = () => {
     switch (currentStep) {
       case 'loading':

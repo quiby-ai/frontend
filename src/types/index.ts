@@ -31,6 +31,25 @@ export type AppStep =
 
 export type MascotState = 'idle' | 'loading' | 'success' | 'error';
 
+export interface AuthResponse {
+  token: string;
+  user?: {
+    id: string;
+    username?: string;
+    firstName?: string;
+    lastName?: string;
+  };
+}
+
+export interface TelegramWebAppUser {
+  id: number;
+  first_name?: string;
+  last_name?: string;
+  username?: string;
+  language_code?: string;
+  is_premium?: boolean;
+}
+
 export interface AppState {
   currentStep: AppStep;
   selectedApp?: App;
