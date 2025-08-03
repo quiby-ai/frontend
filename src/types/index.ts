@@ -3,6 +3,9 @@ export interface App {
   name: string;
   icon?: string;
   category?: string;
+  url?: string;
+  developer?: string;
+  userRatingCount?: number;
 }
 
 export interface Country {

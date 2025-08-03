@@ -1,23 +1,12 @@
-import React, { useState, useMemo } from 'react';
+import React from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { SimpleMascot } from '@/components/mascot/SimpleMascot';
 import { FloatingActionButton } from '@/components/navigation/FloatingActionButton';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Search } from 'lucide-react';
+import { AppCard } from '@/components/ui/app-card';
+import { Search, Loader2, AlertCircle } from 'lucide-react';
 import { App } from '@/types';
-
-// Mock app data
-const POPULAR_APPS: App[] = [
-  { id: '1', name: 'Instagram', category: 'Social' },
-  { id: '2', name: 'WhatsApp', category: 'Communication' },
-  { id: '3', name: 'TikTok', category: 'Entertainment' },
-  { id: '4', name: 'Netflix', category: 'Entertainment' },
-  { id: '5', name: 'Spotify', category: 'Music' },
-  { id: '6', name: 'Uber', category: 'Transportation' },
-  { id: '7', name: 'YouTube', category: 'Entertainment' },
-  { id: '8', name: 'Facebook', category: 'Social' },
-];
+import { useAppStoreSearch } from '@/hooks/useAppStoreSearch';
 
 interface AppSelectionScreenProps {
   selectedApp?: App;
@@ -30,16 +19,7 @@ export const AppSelectionScreen: React.FC<AppSelectionScreenProps> = ({
   onSelectApp,
   onNext
 }) => {
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const filteredApps = useMemo(() => {
-    if (!searchQuery.trim()) return POPULAR_APPS;
-    
-    return POPULAR_APPS.filter(app =>
-      app.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      app.category?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [searchQuery]);
+  const { searchQuery, setSearchQuery, searchResults, loading, error } = useAppStoreSearch();
 
   return (
     <AppLayout>
@@ -56,27 +36,46 @@ export const AppSelectionScreen: React.FC<AppSelectionScreenProps> = ({
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search apps..."
+            placeholder="Search app..."
             className="pl-10 bg-[hsl(var(--surface))] border-[hsl(var(--surface))] text-[hsl(var(--text-primary))]"
           />
+          {loading && (
+            <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 animate-spin text-[hsl(var(--text-muted))]" />
+          )}
         </div>
 
+        {error && (
+          <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-md">
+            <AlertCircle className="w-4 h-4 text-red-500" />
+            <span className="text-sm text-red-700">{error}</span>
+          </div>
+        )}
+
         <div className="space-y-2 max-h-60 overflow-y-auto">
-          {filteredApps.map((app) => (
-            <Button
+          {searchResults.map((app) => (
+            <AppCard
               key={app.id}
-              variant={selectedApp?.id === app.id ? "default" : "outline"}
-              onClick={() => onSelectApp(app)}
-              className="w-full justify-start h-auto p-4 text-left"
-            >
-              <div>
-                <div className="font-medium">{app.name}</div>
-                <div className="text-xs text-[hsl(var(--text-secondary))] mt-1">
-                  {app.category}
-                </div>
-              </div>
-            </Button>
+              app={app}
+              isSelected={selectedApp?.id === app.id}
+              onClick={onSelectApp}
+            />
           ))}
+          
+          {searchResults.length === 0 && !loading && !error && searchQuery.trim() && (
+            <div className="text-center py-8 text-[hsl(var(--text-muted))]">
+              <Search className="w-8 h-8 mx-auto mb-2 opacity-50" />
+              <p>No apps found for "{searchQuery}"</p>
+              <p className="text-xs mt-1">Try a different search term</p>
+            </div>
+          )}
+          
+          {searchResults.length === 0 && !loading && !error && !searchQuery.trim() && (
+            <div className="text-center py-12 text-[hsl(var(--text-muted))]">
+              <Search className="w-12 h-12 mx-auto mb-4 opacity-30" />
+              <p className="text-base mb-2">Search AppStore</p>
+              <p className="text-sm">Enter an app name to find it</p>
+            </div>
+          )}
         </div>
       </div>
 
