@@ -22,16 +22,13 @@ export const AppSelectionScreen: React.FC<AppSelectionScreenProps> = ({
   const { searchQuery, setSearchQuery, searchResults, loading, error } = useAppStoreSearch();
 
   return (
-    <AppLayout 
-      showBackButton={false}
-      title="Select App"
-    >
+    <AppLayout>
       <div className="w-full space-y-6 animate-fade-in-up pb-24">
         {/* Header Section */}
         <div className="text-center space-y-4">
           <div className="relative">
             {/* <div className="absolute inset-0 bg-[rgb(var(--accent))] bg-opacity-5 rounded-full blur-2xl animate-pulse-ios" /> */}
-            <SimpleMascot state="idle" size="md" />
+            <SimpleMascot state="search" size="md" />
           </div>
           <div className="space-y-2">
             <p className="text-base text-[rgb(var(--text-secondary))] ios-text leading-relaxed">

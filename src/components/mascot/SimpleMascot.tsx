@@ -1,8 +1,11 @@
 import React from 'react';
 import { MascotState } from '@/types';
 import { cn } from '@/lib/utils';
-import { Loader2, CheckCircle, XCircle } from 'lucide-react';
+import { Loader2, XCircle } from 'lucide-react';
 import mascotIcon from '@/assets/images/mascot-icon.png';
+import mascotSearchIcon from '@/assets/images/mascot-search.png';
+import mascotWorldIcon from '@/assets/images/mascot-world.png';
+import mascotSamplingIcon from '@/assets/images/mascot-sampling.png';
 
 interface SimpleMascotProps {
   state: MascotState;
@@ -50,13 +53,14 @@ export const SimpleMascot: React.FC<SimpleMascotProps> = ({
       
       case 'success':
         return (
-          <div className={cn(
-            baseClasses,
-            "bg-gradient-to-br from-[hsl(var(--success))] to-[hsl(var(--success))]",
-            "animate-bounce-gentle"
-          )}>
-            <CheckCircle className={cn(iconSizeClasses[size], "text-white")} />
-          </div>
+          <img 
+            src={mascotIcon} 
+            alt="Quiby" 
+            className={cn(
+              sizeClasses[size], 
+              "object-contain hover:scale-105 transition-transform duration-200"
+            )}
+          />
         );
       
       case 'error':
@@ -69,7 +73,43 @@ export const SimpleMascot: React.FC<SimpleMascotProps> = ({
             <XCircle className={cn(iconSizeClasses[size], "text-white")} />
           </div>
         );
+
+      case 'search':
+        return (
+          <img 
+            src={mascotSearchIcon} 
+            alt="Quiby" 
+            className={cn(
+              sizeClasses[size], 
+              "object-contain hover:scale-105 transition-transform duration-200"
+            )}
+          />
+        );
       
+      case 'world':
+        return (
+          <img 
+            src={mascotWorldIcon} 
+            alt="Quiby" 
+            className={cn(
+              sizeClasses[size], 
+              "object-contain hover:scale-105 transition-transform duration-200"
+            )}
+          />
+        );
+
+      case 'sampling':
+        return (
+          <img 
+            src={mascotSamplingIcon} 
+            alt="Quiby" 
+            className={cn(
+              sizeClasses[size], 
+              "object-contain hover:scale-105 transition-transform duration-200"
+            )}
+          />
+        );
+
       default: // idle
         return (
           <img 

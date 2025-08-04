@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { SimpleMascot } from '@/components/mascot/SimpleMascot';
 import { FloatingActionButton } from '@/components/navigation/FloatingActionButton';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Globe } from 'lucide-react';
 import { Country } from '@/types';
 
@@ -51,16 +49,13 @@ export const CountrySelectionScreen: React.FC<CountrySelectionScreenProps> = ({
   const hasSelection = selectedCountries.length > 0 || isWorldwide;
 
   return (
-    <AppLayout 
-      showBackButton={true} 
-      title="Select Countries"
-    >
+    <AppLayout>
       <div className="w-full space-y-8 animate-fade-in-up pb-24">
         {/* Header Section */}
         <div className="text-center space-y-4">
           <div className="relative">
             {/* <div className="absolute inset-0 bg-[rgb(var(--accent))] bg-opacity-5 rounded-full blur-2xl animate-pulse-ios" /> */}
-            <SimpleMascot state="idle" size="md" />
+            <SimpleMascot state="world" size="md" />
           </div>
           <p className="text-base text-[rgb(var(--text-secondary))] ios-text leading-relaxed max-w-xs mx-auto">
             Select countries for analysis
