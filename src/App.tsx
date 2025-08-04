@@ -7,7 +7,7 @@ import { LoadingScreen } from '@/components/screens/LoadingScreen';
 import { WelcomeScreen } from '@/components/screens/WelcomeScreen';
 import { AppSelectionScreen } from '@/components/screens/AppSelectionScreen';
 import { CountrySelectionScreen } from '@/components/screens/CountrySelectionScreen';
-import { TokenLimitScreen } from '@/components/screens/TokenLimitScreen';
+import { SamplingCriteriaScreen } from '@/components/screens/SamplingCriteriaScreen';
 import { ProcessingScreen } from '@/components/screens/ProcessingScreen';
 import { SuccessScreen } from '@/components/screens/SuccessScreen';
 import { ErrorScreen } from '@/components/screens/ErrorScreen';
@@ -17,14 +17,13 @@ function App() {
     currentStep,
     selectedApp,
     selectedCountries,
-    tokenLimit,
     results,
     error,
     setStep,
     setAuthenticated,
     selectApp,
     selectCountries,
-    setTokenLimit,
+    setSamplingCriteria,
     proceedToNextStep,
     reset
   } = useAppFlow();
@@ -33,14 +32,16 @@ function App() {
 
   const handleAuthenticated = () => {
     setAuthenticated(true);
-    setStep('welcome');
+    // setStep('welcome');
+    setStep('sampling_criteria');
   };
 
   useEffect(() => {
     if (userIsAuthenticated) {
       setAuthenticated(true);
       if (currentStep === 'loading') {
-        setStep('welcome');
+        // setStep('welcome');
+        setStep('sampling_criteria');
       }
     }
   }, [userIsAuthenticated, currentStep, setAuthenticated, setStep]);
@@ -49,7 +50,8 @@ function App() {
     console.log('Viewing results:', results);
     alert(`Analysis complete!\n\nApp: ${results?.app.name}\nReviews: ${results?.reviewCount}\nCountries: ${results?.countries.join(', ')}`);
     reset();
-    setStep('welcome');
+    // setStep('welcome');
+    setStep('sampling_criteria');
   };
   const renderCurrentScreen = () => {
     switch (currentStep) {
@@ -77,12 +79,13 @@ function App() {
           />
         );
       
-      case 'token_limit':
+      case 'sampling_criteria':
         return (
-          <TokenLimitScreen
-            tokenLimit={tokenLimit || 1000}
-            onSetTokenLimit={setTokenLimit}
-            onNext={proceedToNextStep}
+          <SamplingCriteriaScreen
+            onNext={(criteria) => {
+              setSamplingCriteria(criteria);
+              proceedToNextStep();
+            }}
           />
         );
       

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { AppState, AppStep, App, ProcessingResults } from '@/types';
+import { AppState, AppStep, App, ProcessingResults, SamplingCriteria } from '@/types';
 
 const initialState: AppState = {
   currentStep: 'loading',
@@ -19,14 +19,15 @@ export const useAppFlow = () => {
 
   const selectApp = useCallback((app: App) => {
     setState(prev => ({ ...prev, selectedApp: app }));
+    console.debug(app);
   }, []);
 
   const selectCountries = useCallback((countries: string[]) => {
     setState(prev => ({ ...prev, selectedCountries: countries }));
   }, []);
 
-  const setTokenLimit = useCallback((limit: number) => {
-    setState(prev => ({ ...prev, tokenLimit: limit }));
+  const setSamplingCriteria = useCallback((criteria: SamplingCriteria) => {
+    setState(prev => ({ ...prev, samplingCriteria: criteria }));
   }, []);
 
   const setError = useCallback((error: Error) => {
@@ -43,18 +44,18 @@ export const useAppFlow = () => {
     
     // Simulate processing
     setTimeout(() => {
-      if (state.selectedApp && state.selectedCountries && state.tokenLimit) {
+      if (state.selectedApp && state.selectedCountries && state.samplingCriteria) {
         const results: ProcessingResults = {
           reviewCount: Math.floor(Math.random() * 1000) + 100,
           app: state.selectedApp,
           countries: state.selectedCountries,
-          tokenLimit: state.tokenLimit,
+          tokenLimit: 1000, // Keep for backwards compatibility
           jobId,
         };
         setResults(results);
       }
     }, 5000);
-  }, [state.selectedApp, state.selectedCountries, state.tokenLimit]);
+  }, [state.selectedApp, state.selectedCountries, state.samplingCriteria]);
 
   const proceedToNextStep = useCallback(() => {
     const { currentStep } = state;
@@ -73,11 +74,11 @@ export const useAppFlow = () => {
         break;
       case 'country_selection':
         if (state.selectedCountries?.length) {
-          setStep('token_limit');
+          setStep('sampling_criteria');
         }
         break;
-      case 'token_limit':
-        if (state.tokenLimit) {
+      case 'sampling_criteria':
+        if (state.samplingCriteria) {
           startProcessing();
         }
         break;
@@ -97,7 +98,7 @@ export const useAppFlow = () => {
     setAuthenticated,
     selectApp,
     selectCountries,
-    setTokenLimit,
+    setSamplingCriteria,
     setError,
     setResults,
     startProcessing,

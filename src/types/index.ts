@@ -27,7 +27,7 @@ export type AppStep =
   | 'welcome' 
   | 'app_selection' 
   | 'country_selection' 
-  | 'token_limit' 
+  | 'sampling_criteria' 
   | 'processing' 
   | 'success' 
   | 'error';
@@ -53,11 +53,20 @@ export interface TelegramWebAppUser {
   is_premium?: boolean;
 }
 
+export type SamplingMode = 'version' | 'dateRange';
+
+export interface SamplingCriteria {
+  mode: SamplingMode;
+  versions?: string[];
+  dateFrom?: string;
+  dateTo?: string;
+}
+
 export interface AppState {
   currentStep: AppStep;
   selectedApp?: App;
   selectedCountries?: string[];
-  tokenLimit?: number;
+  samplingCriteria?: SamplingCriteria;
   jobId?: string;
   results?: ProcessingResults;
   error?: Error;
