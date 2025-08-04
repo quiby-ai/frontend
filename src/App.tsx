@@ -32,16 +32,14 @@ function App() {
 
   const handleAuthenticated = () => {
     setAuthenticated(true);
-    // setStep('welcome');
-    setStep('sampling_criteria');
+    setStep('welcome');
   };
 
   useEffect(() => {
     if (userIsAuthenticated) {
       setAuthenticated(true);
       if (currentStep === 'loading') {
-        // setStep('welcome');
-        setStep('sampling_criteria');
+        setStep('welcome');
       }
     }
   }, [userIsAuthenticated, currentStep, setAuthenticated, setStep]);
@@ -50,8 +48,7 @@ function App() {
     console.log('Viewing results:', results);
     alert(`Analysis complete!\n\nApp: ${results?.app.name}\nReviews: ${results?.reviewCount}\nCountries: ${results?.countries.join(', ')}`);
     reset();
-    // setStep('welcome');
-    setStep('sampling_criteria');
+    setStep('welcome');
   };
   const renderCurrentScreen = () => {
     switch (currentStep) {

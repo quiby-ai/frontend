@@ -7,28 +7,39 @@ interface FloatingActionButtonProps {
   onClick: () => void;
   disabled?: boolean;
   className?: string;
+  icon?: React.ReactNode;
+  label?: string;
 }
 
 export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   onClick,
   disabled = false,
-  className
+  className,
+  icon,
+  label = "Continue"
 }) => {
   return (
-    <Button
-      onClick={onClick}
-      disabled={disabled}
-      className={cn(
-        "fixed bottom-6 right-6 w-14 h-14 rounded-full",
-        "bg-gradient-to-r from-[hsl(var(--primary))] to-[hsl(var(--accent))]",
-        "hover:from-[hsl(var(--accent))] hover:to-[hsl(var(--primary))]",
-        "shadow-lg hover:shadow-xl transition-all duration-200",
-        "disabled:opacity-50 disabled:cursor-not-allowed",
-        "z-50",
-        className
-      )}
-    >
-      <ChevronRight className="w-6 h-6" />
-    </Button>
+    <div className="fixed bottom-0 left-0 right-0 safe-bottom z-50">
+      <div className="px-4 pb-4 pt-2 bg-gradient-to-t from-[rgb(var(--background))] via-[rgb(var(--background))] to-transparent">
+        <Button
+          onClick={onClick}
+          disabled={disabled}
+          size="lg"
+          className={cn(
+            "w-full",
+            "bg-[rgb(var(--accent))] text-[rgb(var(--accent-foreground))]",
+            "shadow-[var(--shadow-lg)]",
+            "rounded-[var(--radius-xl)]",
+            "font-semibold",
+            "ios-button-press",
+            "touch-44",
+            className
+          )}
+        >
+          <span>{label}</span>
+          {icon || <ChevronRight className="w-5 h-5 ml-2" />}
+        </Button>
+      </div>
+    </div>
   );
 };

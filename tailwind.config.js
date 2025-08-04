@@ -10,7 +10,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Nunito', 'system-ui', 'Avenir', 'Helvetica', 'Arial', 'sans-serif'],
+        sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
       },
       borderRadius: {
         lg: 'var(--radius)',

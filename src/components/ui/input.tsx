@@ -11,7 +11,32 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       <input
         type={type}
         className={cn(
-          'flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
+          // Base iOS-style input styling
+          'flex h-12 w-full rounded-[var(--radius-lg)]',
+          'border border-[rgb(var(--secondary-600))]',
+          'bg-[rgb(var(--surface))]',
+          'px-4 py-3',
+          'text-base ios-text',
+          'shadow-[var(--shadow-sm)]',
+          'transition-all duration-200 ease-out',
+          
+          // Typography and placeholders
+          'placeholder:text-[rgb(var(--text-placeholder))]',
+          'file:border-0 file:bg-transparent file:text-base file:font-medium',
+          'file:text-[rgb(var(--text-primary))]',
+          
+          // Focus states
+          'focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent))] focus:ring-offset-1',
+          'focus:border-[rgb(var(--accent))]',
+          'focus:shadow-[var(--shadow-md)]',
+          
+          // Disabled states
+          'disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-[rgb(var(--surface-secondary))]',
+          
+          // iOS-specific behavior
+          'touch-44',
+          '-webkit-appearance-none appearance-none',
+          
           className
         )}
         ref={ref}
