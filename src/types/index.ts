@@ -32,7 +32,7 @@ export type AppStep =
   | 'success' 
   | 'error';
 
-export type MascotState = 'idle' | 'loading' | 'success' | 'error' | 'search' | 'world' | 'sampling';
+export type MascotState = 'idle' | 'loading' | 'success' | 'error' | 'search' | 'world' | 'sampling' | 'processing.fetch' | 'processing.analyze' | 'processing.process' | 'processing.generate';
 
 export interface AuthResponse {
   token: string;

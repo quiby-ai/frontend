@@ -2,10 +2,16 @@ import React from 'react';
 import { MascotState } from '@/types';
 import { cn } from '@/lib/utils';
 import { Loader2, XCircle } from 'lucide-react';
+
 import mascotIcon from '@/assets/images/mascot-icon.png';
 import mascotSearchIcon from '@/assets/images/mascot-search.png';
 import mascotWorldIcon from '@/assets/images/mascot-world.png';
 import mascotSamplingIcon from '@/assets/images/mascot-sampling.png';
+
+import mascotFetchIcon from '@/assets/images/processing/mascot-fetch.png';
+import mascotAnalyzeIcon from '@/assets/images/processing/mascot-analyze.png';
+import mascotProcessIcon from '@/assets/images/processing/mascot-process.png';
+import mascotGenerateIcon from '@/assets/images/processing/mascot-generate.png';
 
 interface SimpleMascotProps {
   state: MascotState;
@@ -106,6 +112,54 @@ export const SimpleMascot: React.FC<SimpleMascotProps> = ({
             className={cn(
               sizeClasses[size], 
               "object-contain hover:scale-105 transition-transform duration-200"
+            )}
+          />
+        );
+
+      case 'processing.fetch':
+        return (
+          <img 
+            src={mascotFetchIcon} 
+            alt="Quiby" 
+            className={cn(
+              sizeClasses[size], 
+              "object-contain hover:scale-105 transition-transform duration-200 animate-heartbeat"
+            )}
+          />
+        );
+      
+      case 'processing.analyze':
+        return (
+          <img 
+            src={mascotAnalyzeIcon} 
+            alt="Quiby" 
+            className={cn(
+              sizeClasses[size], 
+              "object-contain hover:scale-105 transition-transform duration-200 animate-heartbeat"
+            )}
+          />
+        );
+
+      case 'processing.process':
+        return (
+          <img 
+            src={mascotProcessIcon} 
+            alt="Quiby" 
+            className={cn(
+              sizeClasses[size], 
+              "object-contain hover:scale-105 transition-transform duration-200 animate-heartbeat"
+            )}
+          />
+        );
+
+      case 'processing.generate':
+        return (
+          <img 
+            src={mascotGenerateIcon} 
+            alt="Quiby" 
+            className={cn(
+              sizeClasses[size], 
+              "object-contain hover:scale-105 transition-transform duration-200 animate-heartbeat"
             )}
           />
         );

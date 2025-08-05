@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { SimpleMascot } from '@/components/mascot/SimpleMascot';
 import { FloatingActionButton } from '@/components/navigation/FloatingActionButton';
-import { DateRangePicker } from '@/components/ui/date-range-picker';
+// DateRangePicker temporarily disabled for MVP - calendar picker has cross-platform issues
+// import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { SamplingMode, SamplingCriteria } from '@/types';
 import { DateRange } from 'react-day-picker';
 import { Calendar, Clock } from 'lucide-react';
@@ -119,8 +120,9 @@ export const SamplingCriteriaScreen: React.FC<SamplingCriteriaScreenProps> = ({
             >
               <div className="flex flex-col items-center gap-2">
                 <div className="w-10 h-10 rounded-full bg-[rgb(var(--secondary-400))] bg-opacity-20 flex items-center justify-center">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M4 2a2 2 0 00-2 2v11a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4zm0 2h12v11H4V4z" clipRule="evenodd" />
+                  <svg className="w-5 h-5" fill="white" viewBox="0 0 24 24">
+                    <path d="M7 2C5.9 2 5 2.9 5 4v16c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2H7zm0 2h10v12H7V4zm0 14h10v2H7v-2z"/>
+                    <circle cx="12" cy="19" r="1"/>
                   </svg>
                 </div>
                 <span className="text-sm font-medium ios-text">App Version</span>
@@ -164,13 +166,13 @@ export const SamplingCriteriaScreen: React.FC<SamplingCriteriaScreenProps> = ({
             </div>
 
             {/* Divider */}
-            <div className="flex items-center space-x-4">
+            {/* Temporarily hidden - will be updated after MVP release */}
+            {/* <div className="flex items-center space-x-4">
               <div className="flex-1 h-px bg-[rgb(var(--secondary-500))]"></div>
               <span className="text-sm text-[rgb(var(--text-muted))] ios-text">or</span>
               <div className="flex-1 h-px bg-[rgb(var(--secondary-500))]"></div>
             </div>
 
-            {/* Custom Date Range */}
             <div className="space-y-4">
               <h4 className="text-base font-medium text-[rgb(var(--text-primary))] ios-text">
                 Custom Date Range
@@ -184,7 +186,7 @@ export const SamplingCriteriaScreen: React.FC<SamplingCriteriaScreenProps> = ({
                   className="w-full"
                 />
               </div>
-            </div>
+            </div> */}
 
             {/* Selection Summary */}
             {dateRange?.from && dateRange?.to && (
