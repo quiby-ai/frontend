@@ -13,6 +13,9 @@ import mascotAnalyzeIcon from '@/assets/images/processing/mascot-analyze.png';
 import mascotProcessIcon from '@/assets/images/processing/mascot-process.png';
 import mascotGenerateIcon from '@/assets/images/processing/mascot-generate.png';
 
+import mascotErrorIcon from '@/assets/images/mascot-error.png';
+import mascotSuccessIcon from '@/assets/images/mascot-success.png';
+
 interface SimpleMascotProps {
   state: MascotState;
   size?: 'sm' | 'md' | 'lg';
@@ -47,7 +50,7 @@ export const SimpleMascot: React.FC<SimpleMascotProps> = ({
         return (
           <div className={cn(
             baseClasses,
-            "loading-simple bg-gradient-to-br from-[hsl(var(--primary))] to-[hsl(var(--accent))]",
+            "loading-simple bg-accent",
             "border-2 border-[hsl(var(--primary)/0.4)]"
           )}>
             <Loader2 className={cn(
@@ -60,24 +63,25 @@ export const SimpleMascot: React.FC<SimpleMascotProps> = ({
       case 'success':
         return (
           <img 
-            src={mascotIcon} 
+            src={mascotSuccessIcon} 
             alt="Quiby" 
             className={cn(
               sizeClasses[size], 
-              "object-contain hover:scale-105 transition-transform duration-200"
+              "object-contain hover:scale-105 transition-transform duration-200 animate-heartbeat"
             )}
           />
         );
       
       case 'error':
         return (
-          <div className={cn(
-            baseClasses,
-            "bg-gradient-to-br from-[hsl(var(--error))] to-[hsl(var(--error))]",
-            "animate-pulse"
-          )}>
-            <XCircle className={cn(iconSizeClasses[size], "text-white")} />
-          </div>
+          <img 
+            src={mascotErrorIcon} 
+            alt="Quiby" 
+            className={cn(
+              sizeClasses[size], 
+              "object-contain hover:scale-105 transition-transform duration-200"
+            )}
+          />
         );
 
       case 'search':

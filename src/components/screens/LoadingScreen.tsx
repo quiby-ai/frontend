@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { SimpleMascot } from '@/components/mascot/SimpleMascot';
 import { useAuth } from '@/hooks/useAuth';
-import { Button } from '@/components/ui/button';
-import { AlertCircle, RefreshCw } from 'lucide-react';
+import { ErrorScreen } from './ErrorScreen';
 
 interface LoadingScreenProps {
   onAuthenticated: () => void;
@@ -39,72 +38,18 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ onAuthenticated })
 
   // Show error state if authentication failed
   if (authError && hasAttempted) {
+    const authenticationError = new Error(
+      authError || 'auth token expired or could not connect to Telegram'
+    );
+    
     return (
-      <AppLayout 
-        className="bg-gradient-to-br from-[rgb(var(--background))] via-[rgb(var(--surface))] to-[rgb(var(--error-light))]"
-      >
-        <div className="w-full space-y-8 text-center animate-fade-in-up">
-          <div className="relative">
-            {/* <div className="absolute inset-0 bg-[rgb(var(--error))] bg-opacity-10 rounded-full blur-3xl animate-pulse-ios" /> */}
-            <SimpleMascot state="error" size="lg" />
-          </div>
-          
-          <div className="space-y-6">
-            <div className="space-y-3">
-              <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))] ios-text">
-                Authentication Failed
-              </h1>
-              <p className="text-base text-[rgb(var(--text-secondary))] ios-text max-w-sm mx-auto leading-relaxed">
-                We couldn't connect to your Telegram account
-              </p>
-            </div>
-
-            {/* Error Details Card */}
-            <div className="p-5 bg-[rgb(var(--error-light))] border border-[rgb(var(--error))] border-opacity-20 rounded-[var(--radius-xl)] shadow-[var(--shadow-sm)]">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-[rgb(var(--error))] bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
-                  <AlertCircle className="w-5 h-5 text-[rgb(var(--error))]" />
-                </div>
-                <div className="text-left flex-1">
-                  <h3 className="font-semibold text-[rgb(var(--error))] ios-text text-sm">
-                    Connection Error
-                  </h3>
-                  <p className="text-sm text-[rgb(var(--error))] ios-text mt-1 opacity-90">
-                    {authError || "Please check your internet connection and try again."}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Retry Button */}
-            <div className="pt-4">
-              <Button 
-                onClick={() => {
-                  setHasAttempted(false);
-                  window.location.reload();
-                }}
-                size="lg"
-                className="w-full bg-[rgb(var(--error))] text-white font-semibold shadow-[var(--shadow-md)] ios-button-press"
-              >
-                <RefreshCw className="w-5 h-5 mr-2" />
-                Try Again
-              </Button>
-            </div>
-
-            {/* Help Text */}
-            <div className="p-4 bg-[rgb(var(--info-light))] border border-[rgb(var(--info))] border-opacity-20 rounded-[var(--radius-lg)]">
-              <div className="flex items-center gap-3">
-                <svg className="w-5 h-5 text-[rgb(var(--info))] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                </svg>
-                <p className="text-sm text-[rgb(var(--info))] ios-text">
-                  Make sure you're accessing this app through Telegram
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </AppLayout>
+      <ErrorScreen 
+        error={authenticationError}
+        onRetry={() => {
+          setHasAttempted(false);
+          window.location.reload();
+        }}
+      />
     );
   }
 
@@ -113,7 +58,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ onAuthenticated })
     <AppLayout className="bg-gradient-to-br from-[rgb(var(--background))] via-[rgb(var(--surface))] to-[rgb(var(--accent-300))] bg-opacity-5">
       <div className="w-full space-y-8 text-center animate-fade-in-up">
         <div className="relative">
-          <div className="absolute inset-0 bg-[rgb(var(--accent))] bg-opacity-10 rounded-full blur-3xl animate-pulse-ios" />
+          {/* <div className="absolute inset-0 bg-[rgb(var(--accent))] bg-opacity-10 rounded-full blur-3xl animate-pulse-ios" /> */}
           <SimpleMascot state="loading" size="lg" />
         </div>
         
@@ -134,11 +79,11 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ onAuthenticated })
           <div className="p-6 bg-[rgb(var(--surface))] border border-[rgb(var(--secondary-600))] rounded-[var(--radius-xl)] shadow-[var(--shadow-md)]">
             <div className="space-y-4">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-[rgb(var(--accent))] bg-opacity-10 rounded-full flex items-center justify-center animate-breathe">
-                  <svg className="w-6 h-6 text-[rgb(var(--accent))]" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118zM18 6l-8 4-8-4 8-4 8 4z" clipRule="evenodd" />
-                  </svg>
-                </div>
+                  <div className="w-12 h-12 bg-[rgb(var(--accent))] bg-opacity-10 rounded-full flex items-center justify-center animate-breathe">
+                    <svg className="w-6 h-6 text-[rgb(var(--accent))]" fill="white" viewBox="0 0 24 24">
+                      <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
+                    </svg>
+                  </div>
                 <div className="text-left flex-1">
                   <h3 className="font-semibold text-[rgb(var(--text-primary))] ios-text">
                     Connecting to Telegram
@@ -155,7 +100,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ onAuthenticated })
           </div>
 
           {/* Loading Steps */}
-          <div className="space-y-3">
+          {/* <div className="space-y-3">
             <div className="flex items-center gap-3 p-3 bg-[rgb(var(--surface-secondary))] rounded-[var(--radius-lg)]">
               <div className="w-6 h-6 bg-[rgb(var(--accent))] rounded-full flex items-center justify-center">
                 <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -174,7 +119,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ onAuthenticated })
               <div className="w-6 h-6 bg-[rgb(var(--secondary-400))] rounded-full" />
               <span className="text-sm text-[rgb(var(--text-muted))] ios-text">Preparing workspace...</span>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </AppLayout>

@@ -54,7 +54,7 @@ export const ErrorScreen: React.FC<ErrorScreenProps> = ({ error, onRetry }) => {
       <div className="w-full space-y-8 text-center animate-fade-in-up">
         {/* Hero Section */}
         <div className="relative">
-          <div className="absolute inset-0 bg-[rgb(var(--error))] bg-opacity-10 rounded-full blur-3xl animate-pulse-ios" />
+          {/* <div className="absolute inset-0 bg-[rgb(var(--error))] bg-opacity-10 rounded-full blur-3xl animate-pulse-ios" /> */}
           <SimpleMascot state="error" size="lg" />
         </div>
         
@@ -69,7 +69,7 @@ export const ErrorScreen: React.FC<ErrorScreenProps> = ({ error, onRetry }) => {
           </div>
 
           {/* Error Details Card */}
-          <div className="p-5 bg-[rgb(var(--error-light))] border border-[rgb(var(--error))] border-opacity-20 rounded-[var(--radius-xl)] shadow-[var(--shadow-md)]">
+          {/* <div className="p-5 bg-[rgb(var(--error-light))] border border-[rgb(var(--error))] border-opacity-20 rounded-[var(--radius-xl)] shadow-[var(--shadow-md)]">
             <div className="space-y-4">
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 bg-[rgb(var(--error))] bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
@@ -86,7 +86,7 @@ export const ErrorScreen: React.FC<ErrorScreenProps> = ({ error, onRetry }) => {
               </div>
               
               {/* Technical Details (Expandable) */}
-              <div className="pt-3 border-t border-[rgb(var(--error))] border-opacity-20">
+              {/* <div className="pt-3 border-t border-[rgb(var(--error))] border-opacity-20">
                 <details className="text-left">
                   <summary className="text-xs text-[rgb(var(--error))] ios-text cursor-pointer hover:opacity-80">
                     Technical Details
@@ -99,17 +99,14 @@ export const ErrorScreen: React.FC<ErrorScreenProps> = ({ error, onRetry }) => {
                 </details>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Suggestion Card */}
           <div className="p-4 bg-[rgb(var(--info-light))] border border-[rgb(var(--info))] border-opacity-20 rounded-[var(--radius-lg)]">
             <div className="flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-[rgb(var(--info))] mt-0.5 flex-shrink-0" />
+              <AlertTriangle className="w-5 h-5 text-[rgb(var(--info))] my-auto flex-shrink-0" />
               <div className="text-left">
-                <h4 className="font-medium text-[rgb(var(--info))] ios-text text-sm">
-                  Suggestion
-                </h4>
-                <p className="text-sm text-[rgb(var(--info))] ios-text mt-1">
+                <p className="text-sm text-[rgb(var(--info))] ios-text my-auto">
                   {errorInfo.suggestion}
                 </p>
               </div>
