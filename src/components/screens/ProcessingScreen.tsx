@@ -3,78 +3,149 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { Progress } from '@/components/ui/progress';
 import { SimpleMascot } from '../mascot/SimpleMascot';
 import { MascotState } from '@/types';
+import { useWebSocket } from '@/hooks/useWebSocket';
+import { WebSocketMessage, ProcessingStatus, ProcessingStepInfo } from '@/types';
+import { getWebSocketUrl } from '@/config/websocket';
 
-const PROCESSING_STEPS = [
+const PROCESSING_STEPS: ProcessingStepInfo[] = [
   { 
+    step: 'extract',
+    status: 'running',
     message: "Fetching app reviews...", 
     icon: "📱",
     description: "Collecting reviews from app stores",
-    image: 'processing.fetch'
+    image: 'processing.fetch',
+    isActive: false,
+    isCompleted: false,
+    isFailed: false
   },
   { 
-    message: "Analyzing sentiment patterns...", 
-    icon: "🔍",
-    description: "Understanding user emotions and feedback",
-    image: 'processing.analyze'
-  },
-  { 
-    message: "Processing user feedback...", 
-    icon: "⚡",
-    description: "Categorizing and organizing insights",
-    image: 'processing.process'
-  },
-  { 
-    message: "Generating insights...", 
-    icon: "🧠",
-    description: "Creating actionable recommendations",
-    image: 'processing.generate'
-  },
-  { 
-    message: "Finalizing results...", 
-    icon: "✨",
-    description: "Preparing your comprehensive report",
-    image: 'processing.process'
+    step: 'prepare',
+    status: 'running',
+    message: "Preparing insights...", 
+    icon: "🧹",
+    description: "Processing and analyzing review data",
+    image: 'processing.process',
+    isActive: false,
+    isCompleted: false,
+    isFailed: false
   }
 ];
 
 interface ProcessingScreenProps {
   selectedApp?: { name: string };
+  onProcessingComplete?: () => void;
+  onProcessingError?: (error: string) => void;
 }
 
-export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({ selectedApp }) => {
+export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({ 
+  selectedApp, 
+  onProcessingComplete,
+  onProcessingError 
+}) => {
   const [progress, setProgress] = useState(0);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [processingSteps, setProcessingSteps] = useState<ProcessingStepInfo[]>(PROCESSING_STEPS);
+  const [isProcessingComplete, setIsProcessingComplete] = useState(false);
 
-  useEffect(() => {
-    const progressInterval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 100) return 100;
-        const increment = Math.random() * 2 + 1; // Slower, more realistic progress
-        return Math.min(prev + increment, 100);
+  // WebSocket connection for real-time updates
+  const { isConnected } = useWebSocket({
+    url: getWebSocketUrl(),
+    onMessage: handleWebSocketMessage,
+    onError: handleWebSocketError,
+  });
+
+  function handleWebSocketMessage(message: WebSocketMessage) {
+    console.log('WebSocket message received:', message);
+    
+    const { step, status, context } = message;
+    
+    setProcessingSteps(prevSteps => {
+      return prevSteps.map(stepInfo => {
+        if (stepInfo.step === step) {
+          const updatedStep: ProcessingStepInfo = {
+            ...stepInfo,
+            status: status as ProcessingStatus,
+            message: context.message || stepInfo.message,
+            isActive: status === 'running',
+            isCompleted: status === 'completed',
+            isFailed: status === 'failed'
+          };
+          
+          // Update progress based on step completion
+          if (status === 'completed') {
+            const completedSteps = prevSteps.filter(s => s.isCompleted).length;
+            const totalSteps = prevSteps.length;
+            const newProgress = ((completedSteps + 1) / totalSteps) * 100;
+            setProgress(newProgress);
+          }
+          
+          return updatedStep;
+        }
+        return stepInfo;
       });
-    }, 150);
+    });
 
-    const stepInterval = setInterval(() => {
-      setCurrentStepIndex(prev => (prev + 1) % PROCESSING_STEPS.length);
-    }, 2000); // Slower step transitions for better UX
+    // Check if processing is complete
+    if (step === 'prepare' && status === 'completed') {
+      setIsProcessingComplete(true);
+      setProgress(100);
+      onProcessingComplete?.();
+    }
 
-    return () => {
-      clearInterval(progressInterval);
-      clearInterval(stepInterval);
-    };
-  }, []);
+    // Handle failures
+    if (status === 'failed') {
+      onProcessingError?.(`Processing failed at step: ${step}`);
+    }
+  }
 
-  const currentStep = PROCESSING_STEPS[currentStepIndex];
+  function handleWebSocketError(error: Event) {
+    console.error('WebSocket error:', error);
+    onProcessingError?.('Connection error occurred');
+  }
+
+  // Update current step based on active processing steps
+  useEffect(() => {
+    const activeStepIndex = processingSteps.findIndex(step => step.isActive);
+    if (activeStepIndex !== -1) {
+      setCurrentStepIndex(activeStepIndex);
+    }
+  }, [processingSteps]);
+
+  // Fallback progress animation if WebSocket is not connected
+  useEffect(() => {
+    if (!isConnected && !isProcessingComplete) {
+      const progressInterval = setInterval(() => {
+        setProgress(prev => {
+          if (prev >= 90) return 90; // Don't go to 100% without WebSocket confirmation
+          const increment = Math.random() * 2 + 1;
+          return Math.min(prev + increment, 90);
+        });
+      }, 150);
+
+      return () => clearInterval(progressInterval);
+    }
+  }, [isConnected, isProcessingComplete]);
+
+  const currentStep = processingSteps[currentStepIndex];
 
   return (
     <AppLayout 
       className="bg-gradient-to-br from-[rgb(var(--background))] via-[rgb(var(--surface))] to-[rgb(var(--accent-300))] bg-opacity-5"
     >
       <div className="w-full space-y-8 text-center animate-fade-in-up">
+        {/* Connection Status */}
+        {!isConnected && (
+          <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+            <p className="text-yellow-600 text-sm">
+              Connecting to processing server...
+            </p>
+          </div>
+        )}
+
         {/* Hero Section */}
         <div className="space-y-6">
           <div className="relative">
-            {/* <div className="absolute inset-0 bg-[rgb(var(--accent))] bg-opacity-10 rounded-full blur-3xl animate-pulse-ios" /> */}
             <SimpleMascot state={currentStep.image as MascotState} size="lg" />
           </div>
           
@@ -118,26 +189,57 @@ export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({ selectedApp 
             </div>
           </div>
 
-          {/* Current Step */}
-          <div className="p-6 bg-[rgb(var(--surface))] border border-[rgb(var(--secondary-600))] rounded-[var(--radius-xl)] shadow-[var(--shadow-md)] animate-fade-in-scale">
-            <div className="space-y-4">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-[rgb(var(--accent))] bg-opacity-10 rounded-full flex items-center justify-center animate-breathe">
-                  <span className="text-2xl">{currentStep.icon}</span>
-                </div>
-                <div className="text-left flex-1">
-                  <h3 className="font-semibold text-[rgb(var(--text-primary))] ios-text">
-                    {currentStep.message}
-                  </h3>
-                  <p className="text-sm text-[rgb(var(--text-secondary))] ios-text mt-1">
-                    {currentStep.description}
-                  </p>
-                </div>
-                <div className="flex-shrink-0">
-                  <div className="w-6 h-6 border-2 border-[rgb(var(--accent))] border-t-transparent rounded-full animate-spin" />
+          {/* Processing Steps */}
+          <div className="space-y-4">
+            {processingSteps.map((step) => (
+              <div 
+                key={step.step}
+                className={`p-6 bg-[rgb(var(--surface))] border rounded-[var(--radius-xl)] shadow-[var(--shadow-md)] transition-all duration-300 ${
+                  step.isActive 
+                    ? 'border-[rgb(var(--accent))] bg-[rgb(var(--accent))] bg-opacity-5' 
+                    : step.isCompleted 
+                    ? 'border-green-500 bg-green-500 bg-opacity-5'
+                    : step.isFailed
+                    ? 'border-red-500 bg-red-500 bg-opacity-5'
+                    : 'border-[rgb(var(--secondary-600))]'
+                }`}
+              >
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4">
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                      step.isCompleted 
+                        ? 'bg-green-500 text-white' 
+                        : step.isFailed
+                        ? 'bg-red-500 text-white'
+                        : step.isActive
+                        ? 'bg-[rgb(var(--accent))] text-white animate-breathe'
+                        : 'bg-[rgb(var(--secondary-400))] text-[rgb(var(--text-secondary))]'
+                    }`}>
+                      {step.isCompleted ? (
+                        <span className="text-2xl">✅</span>
+                      ) : step.isFailed ? (
+                        <span className="text-2xl">❌</span>
+                      ) : (
+                        <span className="text-2xl">📱</span>
+                      )}
+                    </div>
+                    <div className="text-left flex-1">
+                      <h3 className="font-semibold text-[rgb(var(--text-primary))] ios-text">
+                        {step.message}
+                      </h3>
+                      <p className="text-sm text-[rgb(var(--text-secondary))] ios-text mt-1">
+                        {step.description}
+                      </p>
+                    </div>
+                    <div className="flex-shrink-0">
+                      {step.isActive && !step.isCompleted && !step.isFailed && (
+                        <div className="w-6 h-6 border-2 border-[rgb(var(--accent))] border-t-transparent rounded-full animate-spin" />
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>

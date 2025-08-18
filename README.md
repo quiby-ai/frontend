@@ -1,52 +1,94 @@
-# frontend
-The [frontend] is an UI responsible for handling all client-related actions across the platform.
+# Quiby Frontend
 
-## Environment Configuration
+A React-based frontend application for analyzing app reviews with AI-powered insights.
 
-Create a `.env` file in the root directory with the following variables:
+## Features
 
-```env
-VITE_API_BASE_URL=http://localhost:8080
-VITE_LOGIN_ENDPOINT=/login
+- Modern React 18 with TypeScript
+- Real-time WebSocket integration for processing updates
+- Responsive UI with Tailwind CSS
+- Telegram Web App integration
+- Progressive Web App capabilities
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+ 
+- npm or yarn
+
+### Installation
+
+```bash
+npm install
 ```
 
-For production, update these values to point to your actual API gateway:
-```env
-VITE_API_BASE_URL=https://your-api-gateway.com
-VITE_LOGIN_ENDPOINT=/auth/telegram
+### Environment Configuration
+
+The application uses environment variables for configuration. Create a `.env.local` file in your project root:
+
+```bash
+# WebSocket Configuration
+WS_URL=ws://localhost:8080/ws
+
+# Other environment variables
+NODE_ENV=development
 ```
 
-## Authentication Flow
+### Development
 
-Uses Telegram Mini App authentication with SDK v3:
-- Sends POST request with `Authorization: tma {initData}` header  
-- Stores JWT token in SessionStorage
-- Auto-syncs with user's Telegram theme
-
-### Implementation
-```typescript
-import { init, retrieveRawInitData } from '@telegram-apps/sdk';
-
-init();
-const initDataRaw = retrieveRawInitData();
-
-fetch('https://example.com/api', {
-  method: 'POST',
-  headers: { Authorization: `tma ${initDataRaw}` }
-});
+```bash
+npm run dev
 ```
 
-## Customization
+### Build
 
-### Colors
-Edit `src/index.css` variables:
-```css
---background: 255 255 255;
---primary: 9 9 11;
---text-primary: 9 9 11;
+```bash
+npm run build
 ```
 
-### Design System
-- Shadcn/ui professional theme
-- Inter/Nunito typography
-- Accessible color contrasts
+## WebSocket Integration
+
+The application includes real-time WebSocket integration for processing updates. See [WEBSOCKET_INTEGRATION.md](./WEBSOCKET_INTEGRATION.md) for detailed configuration and usage instructions.
+
+### Quick Setup
+
+1. Set your WebSocket server URL:
+   ```bash
+   WS_URL=ws://your-server.com/ws
+   ```
+
+2. The ProcessingScreen will automatically connect and display real-time updates
+
+## Project Structure
+
+```
+src/
+├── components/          # React components
+│   ├── screens/        # Screen components
+│   ├── ui/            # UI components
+│   └── layout/        # Layout components
+├── hooks/              # Custom React hooks
+├── services/           # API and WebSocket services
+├── types/              # TypeScript type definitions
+└── config/             # Configuration files
+```
+
+## Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run lint` - Run ESLint
+- `npm run preview` - Preview production build
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests and linting
+5. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License.

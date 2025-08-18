@@ -87,7 +87,20 @@ function App() {
         );
       
       case 'processing':
-        return <ProcessingScreen selectedApp={selectedApp} />;
+        return (
+          <ProcessingScreen 
+            selectedApp={selectedApp}
+            onProcessingComplete={() => {
+              // WebSocket confirmed processing is complete
+              proceedToNextStep();
+            }}
+            onProcessingError={(errorMessage) => {
+              // Handle processing errors
+              console.error('Processing error:', errorMessage);
+              // You could set an error state here or navigate to error screen
+            }}
+          />
+        );
       
       case 'success':
         return results ? (

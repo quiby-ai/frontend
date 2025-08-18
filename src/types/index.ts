@@ -72,3 +72,26 @@ export interface AppState {
   error?: Error;
   isAuthenticated: boolean;
 }
+
+export interface WebSocketMessage {
+  step: string;
+  status: string;
+  context: {
+    message: string;
+  };
+}
+
+export type ProcessingStep = 'extract' | 'prepare';
+export type ProcessingStatus = 'running' | 'completed' | 'failed';
+
+export interface ProcessingStepInfo {
+  step: ProcessingStep;
+  status: ProcessingStatus;
+  message: string;
+  icon: string;
+  description: string;
+  image: string;
+  isActive: boolean;
+  isCompleted: boolean;
+  isFailed: boolean;
+}

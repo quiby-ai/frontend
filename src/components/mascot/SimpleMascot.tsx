@@ -1,7 +1,7 @@
 import React from 'react';
 import { MascotState } from '@/types';
 import { cn } from '@/lib/utils';
-import { Loader2, XCircle } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 import mascotIcon from '@/assets/images/mascot-icon.png';
 import mascotSearchIcon from '@/assets/images/mascot-search.png';
@@ -50,7 +50,7 @@ export const SimpleMascot: React.FC<SimpleMascotProps> = ({
         return (
           <div className={cn(
             baseClasses,
-            "loading-simple bg-accent",
+            "loading-simple bg-accent from-[hsl(var(--primary))] to-[hsl(var(--accent))]",
             "border-2 border-[hsl(var(--primary)/0.4)]"
           )}>
             <Loader2 className={cn(
