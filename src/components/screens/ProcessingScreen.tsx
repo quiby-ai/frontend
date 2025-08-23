@@ -74,6 +74,14 @@ export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
     }
   }, [isConnected, connectionError]);
 
+  // Cleanup WebSocket when sagaId changes or component unmounts
+  useEffect(() => {
+    return () => {
+      // This will be handled by the useWebSocket hook cleanup
+      console.log('ProcessingScreen unmounting, WebSocket will be cleaned up');
+    };
+  }, [sagaId]);
+
   function handleWebSocketMessage(message: WebSocketMessage) {
     console.log('WebSocket message received:', message);
     

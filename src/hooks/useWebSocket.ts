@@ -17,6 +17,7 @@ export const useWebSocket = (options: UseWebSocketOptions) => {
   const [isConnected, setIsConnected] = useState(false);
   const [lastMessage, setLastMessage] = useState<WebSocketMessage | null>(null);
   const [connectionError, setConnectionError] = useState<string | null>(null);
+  const urlRef = useRef(url);
 
   const handleMessage = useCallback((message: WebSocketMessage) => {
     setLastMessage(message);
@@ -41,10 +42,19 @@ export const useWebSocket = (options: UseWebSocketOptions) => {
   }, [onError]);
 
   const connect = useCallback(() => {
+    // Only create new connection if URL changed or no existing connection
+    if (wsRef.current && urlRef.current === url) {
+      console.log('WebSocket already exists for this URL, not recreating');
+      return;
+    }
+
+    // Disconnect existing connection if URL changed
     if (wsRef.current) {
+      console.log('URL changed, disconnecting existing WebSocket');
       wsRef.current.disconnect();
     }
 
+    console.log('Creating new WebSocket connection for:', url);
     wsRef.current = new WebSocketService(url, {
       onMessage: handleMessage,
       onOpen: handleOpen,
@@ -52,6 +62,7 @@ export const useWebSocket = (options: UseWebSocketOptions) => {
       onError: handleError,
     });
 
+    urlRef.current = url;
     wsRef.current.connect();
   }, [url, handleMessage, handleOpen, handleClose, handleError]);
 
@@ -64,33 +75,26 @@ export const useWebSocket = (options: UseWebSocketOptions) => {
     setConnectionError(null);
   }, []);
 
-  const stopReconnecting = useCallback(() => {
-    if (wsRef.current) {
-      wsRef.current.stopReconnecting();
-    }
-  }, []);
-
-  const resetReconnection = useCallback(() => {
-    if (wsRef.current) {
-      wsRef.current.resetReconnection();
-    }
-  }, []);
-
   const send = useCallback((data: unknown) => {
     if (wsRef.current) {
       wsRef.current.send(data);
     }
   }, []);
 
+  // Only reconnect when URL changes
   useEffect(() => {
     if (autoConnect) {
       connect();
     }
 
     return () => {
-      disconnect();
+      // Only disconnect on unmount, not on every render
+      if (wsRef.current) {
+        wsRef.current.disconnect();
+        wsRef.current = null;
+      }
     };
-  }, [autoConnect, connect, disconnect]);
+  }, [url]); // Only depend on URL, not on connect function
 
   return {
     isConnected,
@@ -98,8 +102,6 @@ export const useWebSocket = (options: UseWebSocketOptions) => {
     connectionError,
     connect,
     disconnect,
-    stopReconnecting,
-    resetReconnection,
     send,
   };
 };
