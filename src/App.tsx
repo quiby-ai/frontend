@@ -31,6 +31,16 @@ function App() {
     reset
   } = useAppFlow();
 
+  console.log('App render - currentStep:', currentStep, 'sagaId:', sagaId);
+
+  // Handle automatic transition to processing step when sagaId is set
+  useEffect(() => {
+    if (sagaId && currentStep === 'sampling_criteria') {
+      console.log('sagaId detected, transitioning to processing step');
+      setStep('processing');
+    }
+  }, [sagaId, currentStep, setStep]);
+
   const { isAuthenticated: userIsAuthenticated } = useAuth();
 
   const handleAuthenticated = () => {
@@ -85,9 +95,13 @@ function App() {
             selectedApp={selectedApp}
             selectedCountries={selectedCountries || []}
             onNext={async (criteria: SamplingCriteria, sagaId: string) => {
+              console.log('SamplingCriteriaScreen onNext called with:', { criteria, sagaId });
+              console.log('Setting sampling criteria and saga ID...');
+              
               setSamplingCriteria(criteria);
               setSagaId(sagaId);
-              proceedToNextStep();
+              
+              console.log('State updates initiated, useEffect should handle transition');
             }}
           />
         );
