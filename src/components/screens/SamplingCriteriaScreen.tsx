@@ -100,6 +100,42 @@ export const SamplingCriteriaScreen: React.FC<SamplingCriteriaScreenProps> = ({
 
       setIsLoading(true);
 
+      // TODO: remove it after testing
+      // Extract app slug from URL
+      const extractAppSlug = (url: string): string => {
+        try {
+          // Handle Apple App Store URLs
+          if (url.includes('apps.apple.com')) {
+            const match = url.match(/\/app\/([^/]+)\//);
+            if (match && match[1]) {
+              return match[1];
+            }
+          }
+          
+          // Handle Google Play Store URLs
+          if (url.includes('play.google.com')) {
+            const match = url.match(/store\/apps\/details\?id=([^&]+)/);
+            if (match && match[1]) {
+              return match[1];
+            }
+          }
+          
+          // Fallback: extract from any URL path
+          const urlObj = new URL(url);
+          const pathParts = urlObj.pathname.split('/').filter(Boolean);
+          if (pathParts.length > 0) {
+            return pathParts[pathParts.length - 1];
+          }
+          
+          // If all else fails, use the app name
+          return selectedApp?.name.toLowerCase().replace(/\s+/g, '-') || 'unknown-app';
+        } catch (error) {
+          console.warn('Failed to extract app slug from URL:', error);
+          // Fallback to app name
+          return selectedApp?.name.toLowerCase().replace(/\s+/g, '-') || 'unknown-app';
+        }
+      };
+
       // Prepare sampling criteria
       const criteria: SamplingCriteria = {
         mode,
@@ -118,10 +154,14 @@ export const SamplingCriteriaScreen: React.FC<SamplingCriteriaScreenProps> = ({
         return `${year}-${month}-${day}`;
       };
 
+      // Extract app slug from URL
+      const appSlug = selectedApp?.url ? extractAppSlug(selectedApp.url) : selectedApp?.name.toLowerCase().replace(/\s+/g, '-') || 'unknown-app';
+      console.log('Extracted app slug:', appSlug, 'from URL:', selectedApp?.url);
+
       // Make API request
       const response = await startAnalysis({
-        app_id: selectedApp!.id,
-        app_name: selectedApp!.name,
+        app_id: selectedApp?.id || '',
+        app_name: appSlug,
         countries: selectedCountries,
         date_from: dateRange?.from ? formatDateToYYYYMMDD(dateRange.from) : '',
         date_to: dateRange?.to ? formatDateToYYYYMMDD(dateRange.to) : ''
