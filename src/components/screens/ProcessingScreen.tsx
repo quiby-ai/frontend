@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Progress } from '@/components/ui/progress';
 import { SimpleMascot } from '../mascot/SimpleMascot';
-import { MascotState } from '@/types';
+
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { WebSocketMessage, ProcessingStatus, ProcessingStepInfo } from '@/types';
 import { getWebSocketUrl } from '@/config/websocket';
@@ -46,7 +46,6 @@ export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
   onProcessingError 
 }) => {
   const [progress, setProgress] = useState(0);
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [processingSteps, setProcessingSteps] = useState<ProcessingStepInfo[]>(PROCESSING_STEPS);
   const [isProcessingComplete, setIsProcessingComplete] = useState(false);
 
@@ -116,13 +115,7 @@ export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
     onProcessingError?.('Connection error occurred');
   }
 
-  // Update current step based on active processing steps
-  useEffect(() => {
-    const activeStepIndex = processingSteps.findIndex(step => step.isActive);
-    if (activeStepIndex !== -1) {
-      setCurrentStepIndex(activeStepIndex);
-    }
-  }, [processingSteps]);
+
 
   // Fallback progress animation if WebSocket is not connected
   useEffect(() => {
@@ -139,7 +132,7 @@ export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
     }
   }, [isConnected, isProcessingComplete]);
 
-  const currentStep = processingSteps[currentStepIndex];
+
 
   return (
     <AppLayout>
