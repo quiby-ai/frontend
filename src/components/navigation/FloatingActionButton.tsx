@@ -9,6 +9,7 @@ interface FloatingActionButtonProps {
   className?: string;
   icon?: React.ReactNode;
   label?: string;
+  loading?: boolean;
 }
 
 export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
@@ -16,7 +17,8 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   disabled = false,
   className,
   icon,
-  label = "Continue"
+  label = "Continue",
+  loading = false
 }) => {
   return (
     <div className="fixed bottom-0 left-0 right-0 safe-bottom z-50">
@@ -24,6 +26,7 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
         <Button
           onClick={onClick}
           disabled={disabled}
+          loading={loading}
           size="lg"
           className={cn(
             "w-full",

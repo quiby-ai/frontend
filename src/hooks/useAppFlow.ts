@@ -30,6 +30,10 @@ export const useAppFlow = () => {
     setState(prev => ({ ...prev, samplingCriteria: criteria }));
   }, []);
 
+  const setSagaId = useCallback((sagaId: string) => {
+    setState(prev => ({ ...prev, sagaId }));
+  }, []);
+
   const setError = useCallback((error: Error) => {
     setState(prev => ({ ...prev, error, currentStep: 'error' }));
   }, []);
@@ -50,7 +54,7 @@ export const useAppFlow = () => {
           app: state.selectedApp,
           countries: state.selectedCountries,
           tokenLimit: 1000, // Keep for backwards compatibility
-          jobId,
+          sagaId: state.sagaId || `saga_${Date.now()}`,
         };
         setResults(results);
       }
@@ -99,6 +103,7 @@ export const useAppFlow = () => {
     selectApp,
     selectCountries,
     setSamplingCriteria,
+    setSagaId,
     setError,
     setResults,
     startProcessing,

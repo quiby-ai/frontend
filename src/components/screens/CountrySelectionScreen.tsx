@@ -6,14 +6,14 @@ import { Globe } from 'lucide-react';
 import { Country } from '@/types';
 
 const POPULAR_COUNTRIES: Country[] = [
-  { code: 'US', name: 'United States', flag: '🇺🇸' },
-  { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
-  { code: 'DE', name: 'Germany', flag: '🇩🇪' },
-  { code: 'FR', name: 'France', flag: '🇫🇷' },
-  { code: 'JP', name: 'Japan', flag: '🇯🇵' },
-  { code: 'AU', name: 'Australia', flag: '🇦🇺' },
-  { code: 'CA', name: 'Canada', flag: '🇨🇦' },
-  { code: 'BR', name: 'Brazil', flag: '🇧🇷' },
+  { code: 'us', name: 'United States', flag: '🇺🇸' },
+  { code: 'gb', name: 'United Kingdom', flag: '🇬🇧' },
+  { code: 'de', name: 'Germany', flag: '🇩🇪' },
+  { code: 'fr', name: 'France', flag: '🇫🇷' },
+  { code: 'jp', name: 'Japan', flag: '🇯🇵' },
+  { code: 'au', name: 'Australia', flag: '🇦🇺' },
+  { code: 'ca', name: 'Canada', flag: '🇨🇦' },
+  { code: 'br', name: 'Brazil', flag: '🇧🇷' },
 ];
 
 interface CountrySelectionScreenProps {

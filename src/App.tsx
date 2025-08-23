@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useAppFlow } from '@/hooks/useAppFlow';
 import { useAuth } from '@/hooks/useAuth';
+import { SamplingCriteria } from '@/types';
 
 // Screen imports
 import { LoadingScreen } from '@/components/screens/LoadingScreen';
@@ -17,6 +18,7 @@ function App() {
     currentStep,
     selectedApp,
     selectedCountries,
+    sagaId,
     results,
     error,
     setStep,
@@ -24,6 +26,7 @@ function App() {
     selectApp,
     selectCountries,
     setSamplingCriteria,
+    setSagaId,
     proceedToNextStep,
     reset
   } = useAppFlow();
@@ -79,8 +82,11 @@ function App() {
       case 'sampling_criteria':
         return (
           <SamplingCriteriaScreen
-            onNext={(criteria) => {
+            selectedApp={selectedApp}
+            selectedCountries={selectedCountries || []}
+            onNext={async (criteria: SamplingCriteria, sagaId: string) => {
               setSamplingCriteria(criteria);
+              setSagaId(sagaId);
               proceedToNextStep();
             }}
           />
@@ -90,14 +96,12 @@ function App() {
         return (
           <ProcessingScreen 
             selectedApp={selectedApp}
+            sagaId={sagaId}
             onProcessingComplete={() => {
-              // WebSocket confirmed processing is complete
               proceedToNextStep();
             }}
             onProcessingError={(errorMessage) => {
-              // Handle processing errors
               console.error('Processing error:', errorMessage);
-              // You could set an error state here or navigate to error screen
             }}
           />
         );

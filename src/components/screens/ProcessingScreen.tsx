@@ -34,12 +34,14 @@ const PROCESSING_STEPS: ProcessingStepInfo[] = [
 
 interface ProcessingScreenProps {
   selectedApp?: { name: string };
+  sagaId?: string;
   onProcessingComplete?: () => void;
   onProcessingError?: (error: string) => void;
 }
 
 export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({ 
   selectedApp, 
+  sagaId,
   onProcessingComplete,
   onProcessingError 
 }) => {
@@ -50,7 +52,7 @@ export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
 
   // WebSocket connection for real-time updates
   const { isConnected } = useWebSocket({
-    url: getWebSocketUrl(),
+    url: sagaId ? `${getWebSocketUrl()}?saga_id=${sagaId}` : getWebSocketUrl(),
     onMessage: handleWebSocketMessage,
     onError: handleWebSocketError,
   });

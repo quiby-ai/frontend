@@ -189,9 +189,9 @@ export const SuccessScreen: React.FC<SuccessScreenProps> = ({
             </Button>
           </div>
 
-          {/* Job ID for Reference */}
+          {/* Saga ID for Reference */}
           <div className="text-xs text-[rgb(var(--text-muted))] ios-text">
-            Analysis ID: {results.jobId}
+            Analysis ID: {results.sagaId}
           </div>
         </div>
       </div>

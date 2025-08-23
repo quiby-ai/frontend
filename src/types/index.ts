@@ -19,7 +19,7 @@ export interface ProcessingResults {
   app: App;
   countries: string[];
   tokenLimit: number;
-  jobId: string;
+  sagaId: string;
 }
 
 export type AppStep = 
@@ -67,7 +67,7 @@ export interface AppState {
   selectedApp?: App;
   selectedCountries?: string[];
   samplingCriteria?: SamplingCriteria;
-  jobId?: string;
+  sagaId?: string;
   results?: ProcessingResults;
   error?: Error;
   isAuthenticated: boolean;
