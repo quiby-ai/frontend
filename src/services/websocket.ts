@@ -55,7 +55,7 @@ export class WebSocketService {
 
       this.ws.onmessage = (event) => {
         try {
-          const message: WebSocketMessage = JSON.parse(event.data);
+          const message: WebSocketMessage = (JSON.parse(event.data)).payload;
           this.callbacks.onMessage?.(message);
         } catch (error) {
           console.error('Failed to parse WebSocket message:', error);
