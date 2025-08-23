@@ -16,14 +16,17 @@ export const useWebSocket = (options: UseWebSocketOptions) => {
   const wsRef = useRef<WebSocketService | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [lastMessage, setLastMessage] = useState<WebSocketMessage | null>(null);
+  const [connectionError, setConnectionError] = useState<string | null>(null);
 
   const handleMessage = useCallback((message: WebSocketMessage) => {
     setLastMessage(message);
+    setConnectionError(null); // Clear any previous errors on successful message
     onMessage?.(message);
   }, [onMessage]);
 
   const handleOpen = useCallback(() => {
     setIsConnected(true);
+    setConnectionError(null); // Clear any previous errors on successful connection
     onOpen?.();
   }, [onOpen]);
 
@@ -33,6 +36,7 @@ export const useWebSocket = (options: UseWebSocketOptions) => {
   }, [onClose]);
 
   const handleError = useCallback((error: Event) => {
+    setConnectionError('WebSocket connection failed');
     onError?.(error);
   }, [onError]);
 
@@ -57,6 +61,19 @@ export const useWebSocket = (options: UseWebSocketOptions) => {
       wsRef.current = null;
     }
     setIsConnected(false);
+    setConnectionError(null);
+  }, []);
+
+  const stopReconnecting = useCallback(() => {
+    if (wsRef.current) {
+      wsRef.current.stopReconnecting();
+    }
+  }, []);
+
+  const resetReconnection = useCallback(() => {
+    if (wsRef.current) {
+      wsRef.current.resetReconnection();
+    }
   }, []);
 
   const send = useCallback((data: unknown) => {
@@ -78,8 +95,11 @@ export const useWebSocket = (options: UseWebSocketOptions) => {
   return {
     isConnected,
     lastMessage,
+    connectionError,
     connect,
     disconnect,
+    stopReconnecting,
+    resetReconnection,
     send,
   };
 };

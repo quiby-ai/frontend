@@ -19,6 +19,7 @@ export class WebSocketService {
   private maxReconnectAttempts = 5;
   private reconnectDelay = 1000;
   private callbacks: WebSocketCallbacks = {};
+  private shouldReconnect = true;
 
   constructor(
     private url: string,
@@ -34,6 +35,7 @@ export class WebSocketService {
       this.ws.onopen = () => {
         console.log('WebSocket connected');
         this.reconnectAttempts = 0;
+        this.shouldReconnect = true;
         this.callbacks.onOpen?.();
       };
 
@@ -50,36 +52,90 @@ export class WebSocketService {
         console.log('WebSocket closed:', event.code, event.reason);
         this.callbacks.onClose?.();
         
-        // Attempt to reconnect if not a normal closure
-        if (event.code !== 1000 && this.reconnectAttempts < this.maxReconnectAttempts) {
+        // Handle different close codes
+        switch (event.code) {
+          case 1000: // Normal closure
+            console.log('WebSocket closed normally, not reconnecting');
+            this.shouldReconnect = false;
+            break;
+          case 1006: // Abnormal closure (connection lost)
+            console.log('WebSocket connection lost abnormally');
+            break;
+          case 1011: // Server error
+            console.log('WebSocket server error, not reconnecting');
+            this.shouldReconnect = false;
+            break;
+          case 1015: // TLS handshake failure
+            console.log('WebSocket TLS handshake failed, not reconnecting');
+            this.shouldReconnect = false;
+            break;
+          default:
+            console.log(`WebSocket closed with code ${event.code}, reason: ${event.reason}`);
+        }
+        
+        // Check if we should attempt to reconnect
+        if (this.shouldReconnect && this.reconnectAttempts < this.maxReconnectAttempts) {
           this.scheduleReconnect();
+        } else {
+          console.log('Max reconnection attempts reached or reconnection disabled');
         }
       };
 
       this.ws.onerror = (error) => {
         console.error('WebSocket error:', error);
+        
+        // Check if this is an authentication error or immediate failure
+        if (this.ws?.readyState === WebSocket.CLOSED) {
+          // If the connection was immediately closed, it might be an auth issue
+          this.shouldReconnect = false;
+          console.log('WebSocket connection failed immediately, likely due to authentication or server rejection. Stopping reconnection attempts.');
+        }
+        
         this.callbacks.onError?.(error);
       };
     } catch (error) {
       console.error('Failed to create WebSocket connection:', error);
+      this.shouldReconnect = false;
     }
   }
 
   private scheduleReconnect(): void {
+    if (!this.shouldReconnect) {
+      console.log('Reconnection disabled, not scheduling reconnect');
+      return;
+    }
+    
     this.reconnectAttempts++;
     const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
     
+    console.log(`Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`);
+    
     setTimeout(() => {
-      console.log(`Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`);
-      this.connect();
+      if (this.shouldReconnect) {
+        this.connect();
+      }
     }, delay);
   }
 
   disconnect(): void {
+    this.shouldReconnect = false;
     if (this.ws) {
       this.ws.close(1000, 'User initiated disconnect');
       this.ws = null;
     }
+  }
+
+  // Method to manually stop reconnection attempts
+  stopReconnecting(): void {
+    this.shouldReconnect = false;
+    console.log('Reconnection attempts stopped');
+  }
+
+  // Method to reset and allow reconnection again
+  resetReconnection(): void {
+    this.shouldReconnect = true;
+    this.reconnectAttempts = 0;
+    console.log('Reconnection reset, will attempt to connect again');
   }
 
   send(data: unknown): void {

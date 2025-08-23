@@ -51,7 +51,12 @@ export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
   const [isProcessingComplete, setIsProcessingComplete] = useState(false);
 
   // WebSocket connection for real-time updates
-  const { isConnected } = useWebSocket({
+  const { 
+    isConnected, 
+    connectionError, 
+    stopReconnecting, 
+    resetReconnection 
+  } = useWebSocket({
     url: sagaId ? `${getWebSocketUrl()}?saga_id=${sagaId}` : getWebSocketUrl(),
     onMessage: handleWebSocketMessage,
     onError: handleWebSocketError,
@@ -103,6 +108,11 @@ export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
 
   function handleWebSocketError(error: Event) {
     console.error('WebSocket error:', error);
+    
+    // Stop reconnection attempts on error to prevent infinite loops
+    stopReconnecting();
+    
+    // Show error to user
     onProcessingError?.('Connection error occurred');
   }
 
@@ -132,116 +142,142 @@ export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
   const currentStep = processingSteps[currentStepIndex];
 
   return (
-    <AppLayout 
-      className="bg-gradient-to-br from-[rgb(var(--background))] via-[rgb(var(--surface))] to-[rgb(var(--accent-300))] bg-opacity-5"
-    >
-      <div className="w-full space-y-8 text-center animate-fade-in-up">
-        {/* Connection Status */}
-        {!isConnected && (
-          <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-            <p className="text-yellow-600 text-sm">
-              Connecting to processing server...
-            </p>
-          </div>
-        )}
-
-        {/* Hero Section */}
-        <div className="space-y-6">
-          <div className="relative">
-            <SimpleMascot state={currentStep.image as MascotState} size="lg" />
-          </div>
+    <AppLayout>
+      <div className="flex flex-col items-center justify-center min-h-screen p-4">
+        <div className="max-w-md w-full text-center">
+          <SimpleMascot 
+            state={isConnected ? "search" : "error"} 
+            size="md"
+            className="mx-auto mb-6"
+          />
           
-          <div className="space-y-3">
-            <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))] ios-text">
-              Analyzing
-            </h1>
-            <h2 className="text-xl font-semibold text-[rgb(var(--accent))] ios-text">
-              {selectedApp?.name}
-            </h2>
-            <p className="text-base text-[rgb(var(--text-secondary))] ios-text max-w-xs mx-auto leading-relaxed">
-              We're processing your app's reviews to generate insights
-            </p>
-          </div>
-        </div>
+          {connectionError && !isConnected && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-300 rounded-lg">
+              <p className="text-red-700 text-sm mb-2">
+                {connectionError}
+              </p>
+              <button
+                onClick={resetReconnection}
+                className="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors"
+              >
+                Retry Connection
+              </button>
+            </div>
+          )}
 
-        {/* Progress Section */}
-        <div className="space-y-6">
-          {/* Overall Progress */}
-          <div className="p-6 bg-[rgb(var(--surface))] border border-[rgb(var(--secondary-600))] rounded-[var(--radius-xl)] shadow-[var(--shadow-md)]">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-[rgb(var(--text-primary))] ios-text">
-                  Overall Progress
-                </span>
-                <span className="text-sm font-semibold text-[rgb(var(--accent))] ios-text">
-                  {Math.round(progress)}%
-                </span>
-              </div>
-              
-              <div className="relative">
-                <Progress 
-                  value={progress} 
-                  className="w-full h-3 rounded-full bg-[rgb(var(--secondary-400))] bg-opacity-20" 
-                />
-                <div 
-                  className="absolute top-0 left-0 h-3 bg-gradient-to-r from-[rgb(var(--accent))] to-[rgb(var(--accent-400))] rounded-full transition-all duration-300 ease-out shadow-sm"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            {isConnected ? 'Analyzing' : 'Connecting...'}
+          </h1>
+          
+          <p className="text-gray-600 mb-4">
+            {selectedApp?.name || 'App'}
+          </p>
+          
+          <p className="text-gray-500 text-sm mb-6">
+            {isConnected 
+              ? "We're processing your app's reviews to generate insights."
+              : "Connecting to processing server..."
+            }
+          </p>
+
+          {/* Connection Status */}
+          <div className={`mb-6 p-3 rounded-lg text-sm ${
+            isConnected 
+              ? 'bg-green-100 border border-green-300 text-green-700'
+              : 'bg-yellow-100 border border-yellow-300 text-yellow-700'
+          }`}>
+            <div className="flex items-center justify-center gap-2">
+              <div className={`w-2 h-2 rounded-full ${
+                isConnected ? 'bg-green-500' : 'bg-yellow-500'
+              }`} />
+              <span>
+                {isConnected 
+                  ? 'Connected to processing server'
+                  : 'Attempting to connect...'
+                }
+              </span>
             </div>
           </div>
 
-          {/* Processing Steps */}
-          <div className="space-y-4">
-            {processingSteps.map((step) => (
-              <div 
-                key={step.step}
-                className={`p-6 bg-[rgb(var(--surface))] border rounded-[var(--radius-xl)] shadow-[var(--shadow-md)] transition-all duration-300 ${
-                  step.isActive 
-                    ? 'border-[rgb(var(--accent))] bg-[rgb(var(--accent))] bg-opacity-5' 
-                    : step.isCompleted 
-                    ? 'border-green-500 bg-green-500 bg-opacity-5'
-                    : step.isFailed
-                    ? 'border-red-500 bg-red-500 bg-opacity-5'
-                    : 'border-[rgb(var(--secondary-600))]'
-                }`}
-              >
-                <div className="space-y-4">
-                  <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                      step.isCompleted 
-                        ? 'bg-green-500 text-white' 
-                        : step.isFailed
-                        ? 'bg-red-500 text-white'
-                        : step.isActive
-                        ? 'bg-[rgb(var(--accent))] text-white animate-breathe'
-                        : 'bg-[rgb(var(--secondary-400))] text-[rgb(var(--text-secondary))]'
-                    }`}>
-                      {step.isCompleted ? (
-                        <span className="text-2xl">✅</span>
-                      ) : step.isFailed ? (
-                        <span className="text-2xl">❌</span>
-                      ) : (
-                        <span className="text-2xl">📱</span>
-                      )}
-                    </div>
-                    <div className="text-left flex-1">
-                      <h3 className="font-semibold text-[rgb(var(--text-primary))] ios-text">
-                        {step.message}
-                      </h3>
-                      <p className="text-sm text-[rgb(var(--text-secondary))] ios-text mt-1">
-                        {step.description}
-                      </p>
-                    </div>
-                    <div className="flex-shrink-0">
-                      {step.isActive && !step.isCompleted && !step.isFailed && (
-                        <div className="w-6 h-6 border-2 border-[rgb(var(--accent))] border-t-transparent rounded-full animate-spin" />
-                      )}
+          {/* Progress Section */}
+          <div className="space-y-6">
+            {/* Overall Progress */}
+            <div className="p-6 bg-[rgb(var(--surface))] border border-[rgb(var(--secondary-600))] rounded-[var(--radius-xl)] shadow-[var(--shadow-md)]">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-[rgb(var(--text-primary))] ios-text">
+                    Overall Progress
+                  </span>
+                  <span className="text-sm font-semibold text-[rgb(var(--accent))] ios-text">
+                    {Math.round(progress)}%
+                  </span>
+                </div>
+                
+                <div className="relative">
+                  <Progress 
+                    value={progress} 
+                    className="w-full h-3 rounded-full bg-[rgb(var(--secondary-400))] bg-opacity-20" 
+                  />
+                  <div 
+                    className="absolute top-0 left-0 h-3 bg-gradient-to-r from-[rgb(var(--accent))] to-[rgb(var(--accent-400))] rounded-full transition-all duration-300 ease-out shadow-sm"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Processing Steps */}
+            <div className="space-y-4">
+              {processingSteps.map((step) => (
+                <div 
+                  key={step.step}
+                  className={`p-6 bg-[rgb(var(--surface))] border rounded-[var(--radius-xl)] shadow-[var(--shadow-md)] transition-all duration-300 ${
+                    step.isActive 
+                      ? 'border-[rgb(var(--accent))] bg-[rgb(var(--accent))] bg-opacity-5' 
+                      : step.isCompleted 
+                      ? 'border-green-500 bg-green-500 bg-opacity-5'
+                      : step.isFailed
+                      ? 'border-red-500 bg-red-500 bg-opacity-5'
+                      : 'border-[rgb(var(--secondary-600))]'
+                  }`}
+                >
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-4">
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                        step.isCompleted 
+                          ? 'bg-green-500 text-white' 
+                          : step.isFailed
+                          ? 'bg-red-500 text-white'
+                          : step.isActive
+                          ? 'bg-[rgb(var(--accent))] text-white animate-breathe'
+                          : 'bg-[rgb(var(--secondary-400))] text-[rgb(var(--text-secondary))]'
+                      }`}>
+                        {step.isCompleted ? (
+                          <span className="text-2xl">✅</span>
+                        ) : step.isFailed ? (
+                          <span className="text-2xl">❌</span>
+                        ) : (
+                          <span className="text-2xl">📱</span>
+                        )}
+                      </div>
+                      <div className="text-left flex-1">
+                        <h3 className="font-semibold text-[rgb(var(--text-primary))] ios-text">
+                          {step.message}
+                        </h3>
+                        <p className="text-sm text-[rgb(var(--text-secondary))] ios-text mt-1">
+                          {step.description}
+                        </p>
+                      </div>
+                      <div className="flex-shrink-0">
+                        {step.isActive && !step.isCompleted && !step.isFailed && (
+                          <div className="w-6 h-6 border-2 border-[rgb(var(--accent))] border-t-transparent rounded-full animate-spin" />
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </div>
