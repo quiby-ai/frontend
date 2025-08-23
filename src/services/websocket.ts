@@ -56,6 +56,7 @@ export class WebSocketService {
       this.ws.onmessage = (event) => {
         try {
           const { payload } = JSON.parse(event.data);
+          console.log('WebSocket message:', payload);
           const message: WebSocketMessage = payload;
           this.callbacks.onMessage?.(message);
         } catch (error) {
