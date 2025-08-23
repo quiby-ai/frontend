@@ -20,6 +20,7 @@ export class WebSocketService {
   private reconnectDelay = 1000;
   private callbacks: WebSocketCallbacks = {};
   private shouldReconnect = true;
+  private connectionTimeout: NodeJS.Timeout | null = null;
 
   constructor(
     private url: string,
@@ -32,8 +33,21 @@ export class WebSocketService {
     try {
       this.ws = new WebSocket(this.url);
       
+      // Set a connection timeout to detect immediate failures
+      this.connectionTimeout = setTimeout(() => {
+        if (this.ws?.readyState === WebSocket.CONNECTING) {
+          console.log('WebSocket connection timeout - likely authentication failure');
+          this.shouldReconnect = false;
+          this.ws?.close();
+        }
+      }, 5000); // 5 second timeout
+      
       this.ws.onopen = () => {
         console.log('WebSocket connected');
+        if (this.connectionTimeout) {
+          clearTimeout(this.connectionTimeout);
+          this.connectionTimeout = null;
+        }
         this.reconnectAttempts = 0;
         this.shouldReconnect = true;
         this.callbacks.onOpen?.();
@@ -50,6 +64,12 @@ export class WebSocketService {
 
       this.ws.onclose = (event) => {
         console.log('WebSocket closed:', event.code, event.reason);
+        
+        if (this.connectionTimeout) {
+          clearTimeout(this.connectionTimeout);
+          this.connectionTimeout = null;
+        }
+        
         this.callbacks.onClose?.();
         
         // Handle different close codes
@@ -60,6 +80,11 @@ export class WebSocketService {
             break;
           case 1006: // Abnormal closure (connection lost)
             console.log('WebSocket connection lost abnormally');
+            // Only reconnect if we were previously connected
+            if (this.reconnectAttempts === 0) {
+              console.log('Connection failed immediately, likely due to authentication. Stopping reconnection.');
+              this.shouldReconnect = false;
+            }
             break;
           case 1011: // Server error
             console.log('WebSocket server error, not reconnecting');
@@ -83,6 +108,12 @@ export class WebSocketService {
 
       this.ws.onerror = (error) => {
         console.error('WebSocket error:', error);
+        
+        // Clear connection timeout on error
+        if (this.connectionTimeout) {
+          clearTimeout(this.connectionTimeout);
+          this.connectionTimeout = null;
+        }
         
         // Check if this is an authentication error or immediate failure
         if (this.ws?.readyState === WebSocket.CLOSED) {
@@ -119,6 +150,10 @@ export class WebSocketService {
 
   disconnect(): void {
     this.shouldReconnect = false;
+    if (this.connectionTimeout) {
+      clearTimeout(this.connectionTimeout);
+      this.connectionTimeout = null;
+    }
     if (this.ws) {
       this.ws.close(1000, 'User initiated disconnect');
       this.ws = null;
@@ -128,6 +163,10 @@ export class WebSocketService {
   // Method to manually stop reconnection attempts
   stopReconnecting(): void {
     this.shouldReconnect = false;
+    if (this.connectionTimeout) {
+      clearTimeout(this.connectionTimeout);
+      this.connectionTimeout = null;
+    }
     console.log('Reconnection attempts stopped');
   }
 

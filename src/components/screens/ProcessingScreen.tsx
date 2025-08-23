@@ -48,18 +48,31 @@ export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
   const [progress, setProgress] = useState(0);
   const [processingSteps, setProcessingSteps] = useState<ProcessingStepInfo[]>(PROCESSING_STEPS);
   const [isProcessingComplete, setIsProcessingComplete] = useState(false);
+  const [showConnectionError, setShowConnectionError] = useState(false);
 
   // WebSocket connection for real-time updates
   const { 
     isConnected, 
-    connectionError, 
-    stopReconnecting, 
-    resetReconnection 
+    connectionError
   } = useWebSocket({
     url: sagaId ? `${getWebSocketUrl()}?saga_id=${sagaId}` : getWebSocketUrl(),
     onMessage: handleWebSocketMessage,
     onError: handleWebSocketError,
+    onClose: handleWebSocketClose,
   });
+
+  // Show connection error after a delay if still not connected
+  useEffect(() => {
+    if (!isConnected && connectionError) {
+      const timer = setTimeout(() => {
+        setShowConnectionError(true);
+      }, 3000); // Show error after 3 seconds
+      
+      return () => clearTimeout(timer);
+    } else {
+      setShowConnectionError(false);
+    }
+  }, [isConnected, connectionError]);
 
   function handleWebSocketMessage(message: WebSocketMessage) {
     console.log('WebSocket message received:', message);
@@ -108,14 +121,15 @@ export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
   function handleWebSocketError(error: Event) {
     console.error('WebSocket error:', error);
     
-    // Stop reconnection attempts on error to prevent infinite loops
-    stopReconnecting();
-    
-    // Show error to user
-    onProcessingError?.('Connection error occurred');
+    // Don't immediately show error to user - let the WebSocket service handle reconnection
+    // Only show error if we're completely disconnected after multiple attempts
   }
 
-
+  // Handle WebSocket close events
+  function handleWebSocketClose() {
+    console.log('WebSocket connection closed');
+    // Don't immediately show error - let the service handle reconnection
+  }
 
   // Fallback progress animation if WebSocket is not connected
   useEffect(() => {
@@ -132,8 +146,6 @@ export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
     }
   }, [isConnected, isProcessingComplete]);
 
-
-
   return (
     <AppLayout>
       <div className="flex flex-col items-center justify-center min-h-screen p-4">
@@ -144,17 +156,11 @@ export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
             className="mx-auto mb-6"
           />
           
-          {connectionError && !isConnected && (
+          {showConnectionError && (
             <div className="mb-4 p-3 bg-red-100 border border-red-300 rounded-lg">
               <p className="text-red-700 text-sm mb-2">
-                {connectionError}
+                Unable to connect to processing server. This may be due to authentication issues.
               </p>
-              <button
-                onClick={resetReconnection}
-                className="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors"
-              >
-                Retry Connection
-              </button>
             </div>
           )}
 
@@ -177,15 +183,19 @@ export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
           <div className={`mb-6 p-3 rounded-lg text-sm ${
             isConnected 
               ? 'bg-green-100 border border-green-300 text-green-700'
+              : connectionError
+              ? 'bg-red-100 border border-red-300 text-red-700'
               : 'bg-yellow-100 border border-yellow-300 text-yellow-700'
           }`}>
             <div className="flex items-center justify-center gap-2">
               <div className={`w-2 h-2 rounded-full ${
-                isConnected ? 'bg-green-500' : 'bg-yellow-500'
+                isConnected ? 'bg-green-500' : connectionError ? 'bg-red-500' : 'bg-yellow-500'
               }`} />
               <span>
                 {isConnected 
                   ? 'Connected to processing server'
+                  : connectionError
+                  ? 'Connection failed - retrying...'
                   : 'Attempting to connect...'
                 }
               </span>
