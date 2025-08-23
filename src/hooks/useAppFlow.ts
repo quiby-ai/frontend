@@ -83,14 +83,15 @@ export const useAppFlow = () => {
         break;
       case 'sampling_criteria':
         if (state.samplingCriteria) {
-          startProcessing();
+          // Transition directly to processing step - WebSocket will handle real-time updates
+          setStep('processing');
         }
         break;
       case 'error':
         setStep('welcome');
         break;
     }
-  }, [state, setStep, startProcessing]);
+  }, [state, setStep]);
 
   const reset = useCallback(() => {
     setState(initialState);
