@@ -4,33 +4,8 @@ import { Progress } from '@/components/ui/progress';
 import { SimpleMascot } from '../mascot/SimpleMascot';
 
 import { useWebSocket } from '@/hooks/useWebSocket';
-import { WebSocketMessage, ProcessingStatus, ProcessingStepInfo } from '@/types';
+import { WebSocketMessage } from '@/types';
 import { getWebSocketUrl } from '@/config/websocket';
-
-const PROCESSING_STEPS: ProcessingStepInfo[] = [
-  { 
-    step: 'extract',
-    status: 'running',
-    message: "Fetching app reviews...", 
-    icon: "📱",
-    description: "Collecting reviews from app stores",
-    image: 'processing.fetch',
-    isActive: false,
-    isCompleted: false,
-    isFailed: false
-  },
-  { 
-    step: 'prepare',
-    status: 'running',
-    message: "Preparing insights...", 
-    icon: "🧹",
-    description: "Processing and analyzing review data",
-    image: 'processing.process',
-    isActive: false,
-    isCompleted: false,
-    isFailed: false
-  }
-];
 
 interface ProcessingScreenProps {
   selectedApp?: { name: string };
@@ -46,8 +21,6 @@ export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
   onProcessingError 
 }) => {
   const [progress, setProgress] = useState(0);
-  const [processingSteps, setProcessingSteps] = useState<ProcessingStepInfo[]>(PROCESSING_STEPS);
-  const [isProcessingComplete, setIsProcessingComplete] = useState(false);
   const [showConnectionError, setShowConnectionError] = useState(false);
 
   // WebSocket connection for real-time updates
@@ -85,59 +58,29 @@ export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
   function handleWebSocketMessage(message: WebSocketMessage) {
     console.log('WebSocket message received:', message);
     
-    const { step, status, context } = message;
+    const { step, status } = message;
     
-    setProcessingSteps(prevSteps => {
-      const updatedSteps = prevSteps.map(stepInfo => {
-        if (stepInfo.step === step) {
-          const updatedStep: ProcessingStepInfo = {
-            ...stepInfo,
-            status: status as ProcessingStatus,
-            message: context.message || stepInfo.message,
-            isActive: status === 'running',
-            isCompleted: status === 'completed',
-            isFailed: status === 'failed'
-          };
-          
-          return updatedStep;
-        }
-        return stepInfo;
-      });
-      
-      // Calculate progress based on all step statuses
-      let totalProgress = 0;
-      updatedSteps.forEach((stepInfo, index) => {
-        if (stepInfo.isCompleted) {
-          totalProgress += 100;
-        } else if (stepInfo.isActive) {
-          if (index === 0) {
-            totalProgress += 50;
-          } else if (index === 1) {
-            totalProgress += 50;
-          }
-        } else if (stepInfo.isFailed) {
-          totalProgress += 0;
-        } else {
-          totalProgress += 0;
-        }
-      });
-      
-      const averageProgress = totalProgress / updatedSteps.length;
-      console.log('Progress calculation:', {
-        steps: updatedSteps.map(s => ({ step: s.step, status: s.status, isActive: s.isActive, isCompleted: s.isCompleted })),
-        totalProgress,
-        averageProgress,
-        finalProgress: Math.min(averageProgress, 100)
-      });
-      
-      setProgress(Math.min(averageProgress, 100));
-      
-      return updatedSteps;
-    });
+    // Simple progress calculation based on step and status
+    if (step === 'extract') {
+      if (status === 'running') {
+        setProgress(25); // extract step started
+      } else if (status === 'completed') {
+        setProgress(50); // extract step completed
+      } else if (status === 'failed') {
+        setProgress(0); // reset on failure
+      }
+    } else if (step === 'prepare') {
+      if (status === 'running') {
+        setProgress(75); // prepare step started
+      } else if (status === 'completed') {
+        setProgress(100); // prepare step completed
+      } else if (status === 'failed') {
+        setProgress(50); // fall back to extract completed
+      }
+    }
 
     // Check if processing is complete
     if (step === 'prepare' && status === 'completed') {
-      setIsProcessingComplete(true);
       setProgress(100);
       onProcessingComplete?.();
     }
