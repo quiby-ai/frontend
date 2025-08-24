@@ -88,7 +88,7 @@ export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
     const { step, status, context } = message;
     
     setProcessingSteps(prevSteps => {
-      return prevSteps.map(stepInfo => {
+      const updatedSteps = prevSteps.map(stepInfo => {
         if (stepInfo.step === step) {
           const updatedStep: ProcessingStepInfo = {
             ...stepInfo,
@@ -99,18 +99,40 @@ export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
             isFailed: status === 'failed'
           };
           
-          // Update progress based on step completion
-          if (status === 'completed') {
-            const completedSteps = prevSteps.filter(s => s.isCompleted).length;
-            const totalSteps = prevSteps.length;
-            const newProgress = ((completedSteps + 1) / totalSteps) * 100;
-            setProgress(newProgress);
-          }
-          
           return updatedStep;
         }
         return stepInfo;
       });
+      
+      // Calculate progress based on all step statuses
+      let totalProgress = 0;
+      updatedSteps.forEach((stepInfo, index) => {
+        if (stepInfo.isCompleted) {
+          totalProgress += 100;
+        } else if (stepInfo.isActive) {
+          if (index === 0) {
+            totalProgress += 50;
+          } else if (index === 1) {
+            totalProgress += 50;
+          }
+        } else if (stepInfo.isFailed) {
+          totalProgress += 0;
+        } else {
+          totalProgress += 0;
+        }
+      });
+      
+      const averageProgress = totalProgress / updatedSteps.length;
+      console.log('Progress calculation:', {
+        steps: updatedSteps.map(s => ({ step: s.step, status: s.status, isActive: s.isActive, isCompleted: s.isCompleted })),
+        totalProgress,
+        averageProgress,
+        finalProgress: Math.min(averageProgress, 100)
+      });
+      
+      setProgress(Math.min(averageProgress, 100));
+      
+      return updatedSteps;
     });
 
     // Check if processing is complete
@@ -138,21 +160,6 @@ export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
     console.log('WebSocket connection closed');
     // Don't immediately show error - let the service handle reconnection
   }
-
-  // Fallback progress animation if WebSocket is not connected
-  useEffect(() => {
-    if (!isConnected && !isProcessingComplete) {
-      const progressInterval = setInterval(() => {
-        setProgress(prev => {
-          if (prev >= 90) return 90; // Don't go to 100% without WebSocket confirmation
-          const increment = Math.random() * 2 + 1;
-          return Math.min(prev + increment, 90);
-        });
-      }, 150);
-
-      return () => clearInterval(progressInterval);
-    }
-  }, [isConnected, isProcessingComplete]);
 
   return (
     <AppLayout>
@@ -238,7 +245,7 @@ export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
             </div>
 
             {/* Processing Steps */}
-            <div className="space-y-4">
+            {/* <div className="space-y-4">
               {processingSteps.map((step) => (
                 <div 
                   key={step.step}
@@ -288,7 +295,7 @@ export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
                   </div>
                 </div>
               ))}
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
