@@ -76,7 +76,7 @@ export const SuccessScreen: React.FC<SuccessScreenProps> = ({
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-[rgb(var(--success))] ios-text">
-                    {formatNumber(results.reviewCount)}
+                    {formatNumber(results.reviewsCount)}
                   </div>
                   <div className="text-sm text-[rgb(var(--success))] ios-text">
                     Reviews Analyzed

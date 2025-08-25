@@ -28,7 +28,8 @@ function App() {
     setSamplingCriteria,
     setSagaId,
     proceedToNextStep,
-    reset
+    reset,
+    setResults
   } = useAppFlow();
 
   console.log('App render - currentStep:', currentStep, 'sagaId:', sagaId);
@@ -59,7 +60,7 @@ function App() {
 
   const handleViewResults = () => {
     console.log('Viewing results:', results);
-    alert(`Analysis complete!\n\nApp: ${results?.app.name}\nReviews: ${results?.reviewCount}\nCountries: ${results?.countries.join(', ')}`);
+    alert(`Analysis complete!\n\nApp: ${results?.app.name}\nReviews: ${results?.reviewsCount}\nCountries: ${results?.countries.join(', ')}`);
     reset();
     setStep('welcome');
   };
@@ -112,7 +113,19 @@ function App() {
             selectedApp={selectedApp}
             sagaId={sagaId}
             onProcessingComplete={() => {
-              proceedToNextStep();
+              // Create mock results when processing completes
+              if (selectedApp && selectedCountries) {
+                const mockResults = {
+                  reviewsCount: Math.floor(Math.random() * 1000) + 100, // TODO: change it to lookup data
+                  app: selectedApp,
+                  countries: selectedCountries,
+                  sagaId: sagaId || `saga_${Date.now()}`,
+                };
+                setResults(mockResults);
+              } else {
+                // Fallback: just proceed to next step
+                proceedToNextStep();
+              }
             }}
             onProcessingError={(errorMessage) => {
               console.error('Processing error:', errorMessage);

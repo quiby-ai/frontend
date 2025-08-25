@@ -45,20 +45,6 @@ export const useAppFlow = () => {
   const startProcessing = useCallback(() => {
     const jobId = `job_${Date.now()}`;
     setState(prev => ({ ...prev, jobId, currentStep: 'processing' }));
-    
-    // Simulate processing
-    setTimeout(() => {
-      if (state.selectedApp && state.selectedCountries && state.samplingCriteria) {
-        const results: ProcessingResults = {
-          reviewCount: Math.floor(Math.random() * 1000) + 100,
-          app: state.selectedApp,
-          countries: state.selectedCountries,
-          tokenLimit: 1000, // Keep for backwards compatibility
-          sagaId: state.sagaId || `saga_${Date.now()}`,
-        };
-        setResults(results);
-      }
-    }, 5000);
   }, [state.selectedApp, state.selectedCountries, state.samplingCriteria]);
 
   const proceedToNextStep = useCallback(() => {

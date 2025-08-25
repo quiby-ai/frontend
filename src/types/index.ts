@@ -15,10 +15,9 @@ export interface Country {
 }
 
 export interface ProcessingResults {
-  reviewCount: number;
+  reviewsCount: number;
   app: App;
   countries: string[];
-  tokenLimit: number;
   sagaId: string;
 }
 
