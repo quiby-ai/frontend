@@ -80,7 +80,7 @@ export interface WebSocketMessage {
   };
 }
 
-export type ProcessingStep = 'extract' | 'prepare';
+export type ProcessingStep = 'extract' | 'prepare' | 'vectorize';
 export type ProcessingStatus = 'running' | 'completed' | 'failed';
 
 export interface ProcessingStepInfo {

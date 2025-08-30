@@ -63,24 +63,32 @@ export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
     // Simple progress calculation based on step and status
     if (step === 'extract') {
       if (status === 'running') {
-        setProgress(25); // extract step started
+        setProgress(17); // extract step started (33% / 2)
       } else if (status === 'completed') {
-        setProgress(50); // extract step completed
+        setProgress(33); // extract step completed
       } else if (status === 'failed') {
         setProgress(0); // reset on failure
       }
     } else if (step === 'prepare') {
       if (status === 'running') {
-        setProgress(75); // prepare step started
+        setProgress(50); // prepare step started (33% + 17%)
       } else if (status === 'completed') {
-        setProgress(100); // prepare step completed
+        setProgress(66); // prepare step completed
       } else if (status === 'failed') {
-        setProgress(50); // fall back to extract completed
+        setProgress(33); // fall back to extract completed
+      }
+    } else if (step === 'vectorize') {
+      if (status === 'running') {
+        setProgress(83); // vectorize step started (66% + 17%)
+      } else if (status === 'completed') {
+        setProgress(100); // vectorize step completed
+      } else if (status === 'failed') {
+        setProgress(66); // fall back to prepare completed
       }
     }
 
     // Check if processing is complete
-    if (step === 'prepare' && status === 'completed') {
+    if (step === 'vectorize' && status === 'completed') {
       setProgress(100);
       onProcessingComplete?.();
     }
