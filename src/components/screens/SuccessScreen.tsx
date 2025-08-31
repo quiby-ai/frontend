@@ -3,16 +3,18 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { SimpleMascot } from '@/components/mascot/SimpleMascot';
 import { Button } from '@/components/ui/button';
 import { ProcessingResults } from '@/types';
-import { BarChart3, Globe, Users } from 'lucide-react';
+import { BarChart3, Globe, Users, MessageCircle } from 'lucide-react';
 
 interface SuccessScreenProps {
   results: ProcessingResults;
   onViewResults: () => void;
+  onStartChat: () => void;
 }
 
 export const SuccessScreen: React.FC<SuccessScreenProps> = ({ 
   results, 
-  onViewResults 
+  onViewResults,
+  onStartChat
 }) => {
   const formatNumber = (num: number) => {
     if (num >= 1000000) {
@@ -177,15 +179,25 @@ export const SuccessScreen: React.FC<SuccessScreenProps> = ({
             </div>
           )} */}
 
-          {/* Action Button */}
-          <div className="pt-4">
-            <Button 
+          {/* Action Buttons */}
+          <div className="pt-4 space-y-3">
+            {/* <Button 
               onClick={onViewResults}
               size="lg"
               className="w-full bg-[rgb(var(--success))] text-white font-semibold shadow-[var(--shadow-lg)] ios-button-press"
             >
               <BarChart3 className="w-5 h-5 mr-2" />
               View Detailed Results
+            </Button> */}
+            
+            <Button 
+              onClick={onStartChat}
+              variant="outline"
+              size="lg"
+              className="w-full border-[rgb(var(--accent))] text-[rgb(var(--accent))] hover:bg-[rgb(var(--accent))] hover:text-white font-semibold shadow-[var(--shadow-md)] ios-button-press transition-colors"
+            >
+              <MessageCircle className="w-5 h-5 mr-2" />
+              Ask Quiby
             </Button>
           </div>
 

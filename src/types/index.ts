@@ -29,6 +29,7 @@ export type AppStep =
   | 'sampling_criteria' 
   | 'processing' 
   | 'success' 
+  | 'chat'
   | 'error';
 
 export type MascotState = 'idle' | 'loading' | 'success' | 'error' | 'search' | 'world' | 'sampling' | 'processing.fetch' | 'processing.analyze' | 'processing.process' | 'processing.generate';
@@ -93,4 +94,35 @@ export interface ProcessingStepInfo {
   isActive: boolean;
   isCompleted: boolean;
   isFailed: boolean;
+}
+
+export interface RetrievedReview {
+  id: string;
+  content: string;
+  rating: number;
+  country: string;
+  date: string;
+  helpfulCount?: number;
+}
+
+export interface ChatMessage {
+  id: string;
+  type: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+  retrievedReviews?: RetrievedReview[];
+}
+
+export interface RAGQuery {
+  query: string;
+  sagaId: string;
+  appId: string;
+  countries?: string[];
+}
+
+export interface RAGResponse {
+  answer: string;
+  retrievedReviews: RetrievedReview[];
+  confidence: number;
+  processingTime: number;
 }

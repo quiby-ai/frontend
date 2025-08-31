@@ -73,11 +73,25 @@ export const useAppFlow = () => {
           setStep('processing');
         }
         break;
+      case 'success':
+        // Stay on success step - user can choose to view results or start chat
+        break;
+      case 'chat':
+        // Stay on chat step - user can continue chatting or go back
+        break;
       case 'error':
         setStep('welcome');
         break;
     }
   }, [state, setStep]);
+
+  const navigateToChat = useCallback(() => {
+    setStep('chat');
+  }, [setStep]);
+
+  const navigateBackFromChat = useCallback(() => {
+    setStep('success');
+  }, [setStep]);
 
   const reset = useCallback(() => {
     setState(initialState);
@@ -95,6 +109,8 @@ export const useAppFlow = () => {
     setResults,
     startProcessing,
     proceedToNextStep,
+    navigateToChat,
+    navigateBackFromChat,
     reset,
   };
 };

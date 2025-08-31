@@ -11,6 +11,7 @@ import { CountrySelectionScreen } from '@/components/screens/CountrySelectionScr
 import { SamplingCriteriaScreen } from '@/components/screens/SamplingCriteriaScreen';
 import { ProcessingScreen } from '@/components/screens/ProcessingScreen';
 import { SuccessScreen } from '@/components/screens/SuccessScreen';
+import { ChatScreen } from '@/components/screens/ChatScreen';
 import { ErrorScreen } from '@/components/screens/ErrorScreen';
 
 function App() {
@@ -28,6 +29,8 @@ function App() {
     setSamplingCriteria,
     setSagaId,
     proceedToNextStep,
+    navigateToChat,
+    navigateBackFromChat,
     reset,
     setResults
   } = useAppFlow();
@@ -138,6 +141,15 @@ function App() {
           <SuccessScreen
             results={results}
             onViewResults={handleViewResults}
+            onStartChat={navigateToChat}
+          />
+        ) : null;
+      
+      case 'chat':
+        return results ? (
+          <ChatScreen
+            results={results}
+            onBack={navigateBackFromChat}
           />
         ) : null;
       
