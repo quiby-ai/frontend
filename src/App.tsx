@@ -31,7 +31,6 @@ function App() {
     proceedToNextStep,
     navigateToChat,
     navigateBackFromChat,
-    reset,
     setResults
   } = useAppFlow();
 
@@ -61,12 +60,6 @@ function App() {
     }
   }, [userIsAuthenticated, currentStep, setAuthenticated, setStep]);
 
-  const handleViewResults = () => {
-    console.log('Viewing results:', results);
-    alert(`Analysis complete!\n\nApp: ${results?.app.name}\nReviews: ${results?.reviewsCount}\nCountries: ${results?.countries.join(', ')}`);
-    reset();
-    setStep('welcome');
-  };
   const renderCurrentScreen = () => {
     switch (currentStep) {
       case 'loading':
@@ -140,7 +133,6 @@ function App() {
         return results ? (
           <SuccessScreen
             results={results}
-            // onViewResults={handleViewResults}
             onStartChat={navigateToChat}
           />
         ) : null;
