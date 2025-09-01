@@ -7,13 +7,13 @@ import { BarChart3, Globe, Users, MessageCircle } from 'lucide-react';
 
 interface SuccessScreenProps {
   results: ProcessingResults;
-  onViewResults: () => void;
+  // onViewResults: () => void;
   onStartChat: () => void;
 }
 
 export const SuccessScreen: React.FC<SuccessScreenProps> = ({ 
   results, 
-  onViewResults,
+  // onViewResults,
   onStartChat
 }) => {
   const formatNumber = (num: number) => {

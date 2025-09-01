@@ -140,7 +140,7 @@ function App() {
         return results ? (
           <SuccessScreen
             results={results}
-            onViewResults={handleViewResults}
+            // onViewResults={handleViewResults}
             onStartChat={navigateToChat}
           />
         ) : null;
