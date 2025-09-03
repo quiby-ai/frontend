@@ -3,17 +3,91 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { SimpleMascot } from '@/components/mascot/SimpleMascot';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ProcessingResults, ChatMessage, RAGQuery } from '@/types';
 import { sendRAGQuery } from '@/services/api';
-import { Send, ArrowLeft, Star, Globe, Calendar, MessageCircle, Loader2 } from 'lucide-react';
+import { Send, ArrowLeft, Star, MessageCircle, Loader2 } from 'lucide-react';
 
 interface ChatScreenProps {
   results: ProcessingResults;
   onBack: () => void;
 }
+
+// Utility function to convert country code to flag emoji
+const getCountryFlag = (countryCode: string): string => {
+  const flagEmojis: { [key: string]: string } = {
+    'us': '🇺🇸',
+    'gb': '🇬🇧',
+    'de': '🇩🇪',
+    'fr': '🇫🇷',
+    'jp': '🇯🇵',
+    'au': '🇦🇺',
+    'ca': '🇨🇦',
+    'br': '🇧🇷',
+    'in': '🇮🇳',
+    'cn': '🇨🇳',
+    'kr': '🇰🇷',
+    'it': '🇮🇹',
+    'es': '🇪🇸',
+    'nl': '🇳🇱',
+    'se': '🇸🇪',
+    'no': '🇳🇴',
+    'dk': '🇩🇰',
+    'fi': '🇫🇮',
+    'pl': '🇵🇱',
+    'ru': '🇷🇺',
+    'mx': '🇲🇽',
+    'ar': '🇦🇷',
+    'cl': '🇨🇱',
+    'pe': '🇵🇪',
+    'co': '🇨🇴',
+    've': '🇻🇪',
+    'za': '🇿🇦',
+    'ng': '🇳🇬',
+    'eg': '🇪🇬',
+    'sa': '🇸🇦',
+    'ae': '🇦🇪',
+    'tr': '🇹🇷',
+    'il': '🇮🇱',
+    'th': '🇹🇭',
+    'sg': '🇸🇬',
+    'my': '🇲🇾',
+    'id': '🇮🇩',
+    'ph': '🇵🇭',
+    'vn': '🇻🇳',
+    'nz': '🇳🇿',
+    'ie': '🇮🇪',
+    'ch': '🇨🇭',
+    'at': '🇦🇹',
+    'be': '🇧🇪',
+    'pt': '🇵🇹',
+    'gr': '🇬🇷',
+    'cz': '🇨🇿',
+    'hu': '🇭🇺',
+    'ro': '🇷🇴',
+    'bg': '🇧🇬',
+    'hr': '🇭🇷',
+    'si': '🇸🇮',
+    'sk': '🇸🇰',
+    'lt': '🇱🇹',
+    'lv': '🇱🇻',
+    'ee': '🇪🇪',
+    'cy': '🇨🇾',
+    'mt': '🇲🇹',
+    'lu': '🇱🇺',
+    'is': '🇮🇸',
+    'mc': '🇲🇨',
+    'li': '🇱🇮',
+    'sm': '🇸🇲',
+    'va': '🇻🇦',
+    'ad': '🇦🇩',
+    'worldwide': '🌍'
+  };
+  
+  return flagEmojis[countryCode.toLowerCase()] || '🏳️';
+};
 
 export const ChatScreen: React.FC<ChatScreenProps> = ({ results, onBack }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -169,34 +243,29 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ results, onBack }) => {
                       </div>
                       
                       {message.retrievedReviews.map((review) => (
-                        <Card key={review.id} className="bg-[rgb(var(--background))] border-[rgb(var(--border))]">
-                          <CardHeader className="pb-2">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
+                        <Card key={review.id} className="bg-[rgb(var(--background))] border-[rgb(var(--border))] relative">
+                          <CardContent className="p-3">
+                            <div className="flex items-start gap-2 mb-2">
+                              <span className="text-lg">{getCountryFlag(review.country)}</span>
+                              <div className="flex items-center gap-1">
                                 {renderStars(review.rating)}
-                                <span className="text-xs font-medium text-[rgb(var(--text-primary))] ios-text">
-                                  {review.rating}/5
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-2 text-xs text-[rgb(var(--text-secondary))] ios-text">
-                                <Globe className="w-3 h-3" />
-                                <span>{review.country}</span>
-                                <Calendar className="w-3 h-3" />
-                                <span>{formatDate(review.date)}</span>
                               </div>
                             </div>
-                          </CardHeader>
-                          <CardContent className="pt-0">
-                            <p className="text-sm text-[rgb(var(--text-primary))] ios-text leading-relaxed">
+                            
+                            <p className="text-sm text-[rgb(var(--text-primary))] ios-text leading-relaxed mb-3">
                               {review.content}
                             </p>
-                            {review.helpfulCount && (
-                              <div className="flex items-center gap-1 mt-2">
+                            
+                            <div className="flex items-center justify-between">
+                              {review.helpfulCount && (
                                 <Badge variant="secondary" className="text-xs">
                                   👍 {review.helpfulCount} helpful
                                 </Badge>
-                              </div>
-                            )}
+                              )}
+                              <span className="text-xs text-[rgb(var(--text-muted))] ios-text">
+                                {formatDate(review.date)}
+                              </span>
+                            </div>
                           </CardContent>
                         </Card>
                       ))}
