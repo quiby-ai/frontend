@@ -115,9 +115,7 @@ export interface ChatMessage {
 
 export interface RAGQuery {
   query: string;
-  sagaId: string;
   appId: string;
-  countries?: string[];
 }
 
 export interface RAGResponse {

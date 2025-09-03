@@ -56,9 +56,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ results, onBack }) => {
       // Prepare RAG query
       const ragQuery: RAGQuery = {
         query: userQuery,
-        sagaId: results.sagaId,
         appId: results.app.id,
-        countries: results.countries,
       };
 
       // Send query to RAG service
@@ -116,9 +114,9 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ results, onBack }) => {
 
   return (
     <AppLayout className="bg-gradient-to-br from-[rgb(var(--background))] via-[rgb(var(--surface))] to-[rgb(var(--accent-light))]">
-      <div className="w-full h-full flex flex-col">
-        {/* Header */}
-        <div className="flex items-center gap-4 p-4 border-b border-[rgb(var(--border))] bg-[rgb(var(--surface))]">
+      <div className="w-full h-full flex flex-col relative">
+        {/* Fixed Header */}
+        <div className="fixed top-0 left-0 right-0 z-10 flex items-center gap-4 p-4 border-b border-[rgb(var(--border))] bg-[rgb(var(--surface))]">
           <Button
             variant="ghost"
             size="sm"
@@ -132,7 +130,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ results, onBack }) => {
             <SimpleMascot state="search" size="sm" />
             <div>
               <h1 className="font-semibold text-[rgb(var(--text-primary))] ios-text">
-                AI Chat Assistant
+                Quiby
               </h1>
               <p className="text-sm text-[rgb(var(--text-secondary))] ios-text">
                 {results.app.name} • {results.reviewsCount.toLocaleString()} reviews
@@ -141,15 +139,15 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ results, onBack }) => {
           </div>
         </div>
 
-        {/* Chat Messages */}
+        {/* Chat Messages - Scroll Area */}
         <ScrollArea 
           ref={scrollAreaRef}
-          className="flex-1 p-4 space-y-4"
+          className="flex-1 p-4 space-y-4 mt-[88px] mb-[120px]"
         >
           {messages.map((message) => (
             <div
               key={message.id}
-              className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+              className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'} mb-4`}
             >
               <div
                 className={`max-w-[80%] space-y-3 ${
@@ -217,7 +215,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ results, onBack }) => {
           ))}
           
           {isLoading && (
-            <div className="flex justify-start">
+            <div className="flex justify-start mb-4">
               <div className="bg-[rgb(var(--surface))] border border-[rgb(var(--border))] rounded-[var(--radius-lg)] p-4 shadow-[var(--shadow-sm)]">
                 <div className="flex items-center gap-2">
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -232,8 +230,8 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ results, onBack }) => {
           <div ref={messagesEndRef} />
         </ScrollArea>
 
-        {/* Input Area */}
-        <div className="p-4 border-t border-[rgb(var(--border))] bg-[rgb(var(--surface))]">
+        {/* Fixed Input Area */}
+        <div className="fixed bottom-0 left-0 right-0 z-10 p-4 border-t border-[rgb(var(--border))] bg-[rgb(var(--surface))]">
           <div className="flex gap-2">
             <Input
               value={inputValue}
